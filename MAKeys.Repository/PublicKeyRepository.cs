@@ -15,7 +15,7 @@ namespace MAKeys.Repository
 
         public IEnumerable<PublicKey> GetAllPublicKeys()
         {
-            return FindAll().OrderBy(pk => pk.Id).ToList();
+            return FindAll().OrderBy(pk => pk.SubmissionDate).ToList();
         }
 
         public PublicKey GetPublicKeyByFingerprint(string fingerprint)

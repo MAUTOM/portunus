@@ -1,4 +1,5 @@
 using System;
+using MAKeys.Entities.Configuration;
 using MAKeys.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,24 +22,7 @@ namespace MAKeys.Entities
                 .HasDefaultValueSql("now()");
             
             // seed
-            modelBuilder.Entity<PublicKey>().HasData(new PublicKey()
-                {
-                    Id = 1,
-                    Name = "Horváth Bence",
-                    Email = "horvath.bence@muszerautomatika.hu",
-                    Armor = "noarmor",
-                    ExpirationDate = DateTime.Now + TimeSpan.FromDays(365),
-                    Fingerprint = "fprint"
-                },
-                new PublicKey()
-                {
-                    Id = 2,
-                    Name = "Horváth Gábor",
-                    Email = "horvath.gabor@muszerautomatika.hu",
-                    Armor = "noarmor",
-                    ExpirationDate = DateTime.Now + TimeSpan.FromDays(365),
-                    Fingerprint = "fprint2"
-                });
+            modelBuilder.ApplyConfiguration(new PublicKeyConfiguration());
         }
     }
 }
