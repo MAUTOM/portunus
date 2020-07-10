@@ -1,6 +1,6 @@
 namespace MAKeys.Contracts
 {
-    public interface IRepositoryWrapper
+    public interface IRepositoryManager
     {
         IPublicKeyRepository PublicKey { get; }
         void Save();

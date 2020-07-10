@@ -3,12 +3,12 @@ using MAKeys.Entities;
 
 namespace MAKeys.Repository
 {
-    public class RepositoryWrapper : IRepositoryWrapper
+    public class RepositoryManager : IRepositoryManager
     {
         private readonly RepositoryContext _repoContext;
         private IPublicKeyRepository _publicKeyRepository;
         
-        public RepositoryWrapper(RepositoryContext context)
+        public RepositoryManager(RepositoryContext context)
         {
             _repoContext = context;
         }
