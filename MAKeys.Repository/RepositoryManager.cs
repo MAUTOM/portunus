@@ -13,20 +13,8 @@ namespace MAKeys.Repository
             _repoContext = context;
         }
 
-        public IPublicKeyRepository PublicKey
-        {
-            get
-            {
-                if(_publicKeyRepository == null)
-                    _publicKeyRepository = new PublicKeyRepository(_repoContext);
+        public IPublicKeyRepository PublicKey => _publicKeyRepository ??= new PublicKeyRepository(_repoContext);
 
-                return _publicKeyRepository;
-            }
-        }
-
-        public void Save()
-        {
-            _repoContext.SaveChanges();
-        }
+        public void Save() => _repoContext.SaveChanges();
     }
 }

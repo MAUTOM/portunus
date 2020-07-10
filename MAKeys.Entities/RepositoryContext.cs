@@ -1,6 +1,7 @@
 using System;
 using MAKeys.Entities.Configuration;
 using MAKeys.Entities.Models;
+using MAKeys.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace MAKeys.Entities
@@ -16,13 +17,19 @@ namespace MAKeys.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<PublicKey>().ToTable("PublicKeys");
+            
             modelBuilder.Entity<PublicKey>()
                 .Property((k) => k.SubmissionDate)
                 .HasDefaultValueSql("now()");
+
+            modelBuilder.Entity<PublicKey>()
+                .Property(k => k.Flags)
+                .HasDefaultValue(PublicKeyFlags.None);
+            
             
             // seed
             modelBuilder.ApplyConfiguration(new PublicKeyConfiguration());
+            modelBuilder.ApplyConfiguration(new KeyIdentityConfiguration());
         }
     }
 }

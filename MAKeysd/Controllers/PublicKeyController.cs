@@ -8,19 +8,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MAKeysd.Controllers
 {
-    [Route("api/publickey")]
+    [Route("api/publickeys")]
     [ApiController]
     public class PublicKeyController : ControllerBase
     {
         private readonly ILoggerManager _logger;
-        private readonly IRepositoryWrapper _repository;
+        private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
         
         // GET
-        public PublicKeyController(ILoggerManager logger, IRepositoryWrapper wrapper, IMapper mapper)
+        public PublicKeyController(ILoggerManager logger, IRepositoryManager manager, IMapper mapper)
         {
             _logger = logger;
-            _repository = wrapper;
+            _repository = manager;
             _mapper = mapper;
         }
         

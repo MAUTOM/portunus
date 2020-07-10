@@ -13,14 +13,14 @@ namespace MAKeys.Repository
             
         }
 
-        public IEnumerable<PublicKey> GetAllPublicKeys()
+        public IEnumerable<PublicKey> GetAllPublicKeys(bool trackChanges = true)
         {
-            return FindAll().OrderBy(pk => pk.SubmissionDate).ToList();
+            return FindAll(trackChanges).OrderBy(pk => pk.SubmissionDate).ToList();
         }
 
-        public PublicKey GetPublicKeyByFingerprint(string fingerprint)
+        public PublicKey GetPublicKeyByFingerprint(string fingerprint, bool trackChanges = true)
         {
-            return FindByCondition(key => key.Fingerprint.Equals(fingerprint)).FirstOrDefault();
+            return FindByCondition(key => key.Fingerprint.Equals(fingerprint), trackChanges).FirstOrDefault();
         }
 
         public void CreatePublicKey(PublicKey key)

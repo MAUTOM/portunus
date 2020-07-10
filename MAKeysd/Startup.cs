@@ -38,7 +38,7 @@ namespace MAKeysd
             services.ConfigureIISIntegration();
             services.ConfigureLoggerService();
             services.ConfigureMySqlContext(Configuration);
-            services.ConfigureRepositoryWrapper();
+            services.ConfigureRepositoryManager();
 
             services.AddAutoMapper(typeof(Startup));
             

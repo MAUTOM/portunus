@@ -1,4 +1,9 @@
-$HEADER$namespace $NAMESPACE$
+namespace MAKeys.Shared
 {
-  public class $CLASS$ {$END$}
+    public enum PublicKeyLength
+    {
+        KeyLength1024 = 1024,
+        KeyLength2048 = 2048,
+        KeyLength4096 = 4096
+    }
 }

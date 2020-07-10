@@ -41,9 +41,9 @@ namespace MAKeysd.Extensions
             services.AddDbContext<RepositoryContext>(o => o.UseMySql(connectionString, options => options.MigrationsAssembly("MAKeys.Entities")));
         }
         
-        public static void ConfigureRepositoryWrapper(this IServiceCollection services)
+        public static void ConfigureRepositoryManager(this IServiceCollection services)
         {
-            services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MAKeys.Entities.Models
 {
+    [Table("KeyIdentities")]
     public sealed class KeyIdentity
     {
         [Column("IdentityId")]
@@ -24,9 +25,17 @@ namespace MAKeys.Entities.Models
         [Display(Name = "Comment specified for User ID.")]
         [MaxLength(200, ErrorMessage = "User ID comment must not exceed 200 characters.")]
         public string? Comment { get; set; }
+        
+        [Required(ErrorMessage = "User ID creation date must be specified.")]
+        public DateTime CreationDate { get; set; }
 
         [ForeignKey(nameof(PublicKey))] 
         public string PublicKeyFingerprint { get; set; } = null!;
         public PublicKey PublicKey { get; set; } = null!;
+
+        public override string ToString()
+        {
+            return $"{Name} ({Comment}) <{Email}>";
+        }
     }
 }

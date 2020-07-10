@@ -3,7 +3,7 @@ using System;
 namespace MAKeys.Shared
 {
     [Flags]
-    public enum PublicKeyFlag 
+    public enum PublicKeyFlags 
     {
         [StringValue("")]
         None = 0,
