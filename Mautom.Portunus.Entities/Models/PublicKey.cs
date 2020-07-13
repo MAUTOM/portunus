@@ -45,6 +45,6 @@ namespace Mautom.Portunus.Entities.Models
         public PublicKeyAlgorithm Algorithm { get; set; }
         public PublicKeyLength Length { get; set; }
 
-        public ICollection<KeyIdentity> KeyIdentities { get; set; } = null!;
+        public List<KeyIdentity> KeyIdentities { get; set; } = null!;
     }
 }

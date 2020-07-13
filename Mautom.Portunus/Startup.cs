@@ -18,6 +18,8 @@
 
 using System.IO;
 using AutoMapper;
+using AutoMapper.EquivalencyExpression;
+using Mautom.Portunus.Entities;
 using Mautom.Portunus.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -50,6 +52,12 @@ namespace Mautom.Portunus
             services.ConfigureRepositoryManager();
 
             services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper((sp, automapper) =>
+            {
+                automapper.AddCollectionMappers();
+                automapper.UseEntityFrameworkCoreModel<RepositoryContext>(services);
+                
+            }, typeof(RepositoryContext).Assembly);
             
             services.AddControllers();
         }

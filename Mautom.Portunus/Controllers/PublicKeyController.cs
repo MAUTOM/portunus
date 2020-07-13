@@ -50,7 +50,7 @@ namespace Mautom.Portunus.Controllers
                 _logger.LogInfo("Fetched all public keys from database");
 
                 var pubKeyResult = _mapper.Map<IEnumerable<PublicKeyDto>>(pubKeys);
-
+                
                 return Ok(pubKeyResult);
             }
             catch (Exception ex)
@@ -78,6 +78,11 @@ namespace Mautom.Portunus.Controllers
                 {
                     _logger.LogInfo($"Fetched key {fingerprint}");
                     var keyResult = _mapper.Map<PublicKeyDto>(key);
+                    keyResult.KeyIdentities = new List<KeyIdentityDto>();
+                    // this fails, TODO key identities are not loaded by EF
+                    foreach(var identity in key.KeyIdentities)
+                        keyResult.KeyIdentities.Add(_mapper.Map<KeyIdentityDto>(identity));
+                    
                     return Ok(keyResult);
                 }
             }

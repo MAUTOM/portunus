@@ -26,7 +26,7 @@ namespace Mautom.Portunus.Entities.DataTransferObjects
     {
         public string Fingerprint { get; set; } = null!;
 
-        public ICollection<KeyIdentityDto> KeyIdentities { get; set; } = null!;
+        public List<KeyIdentityDto> KeyIdentities { get; set; } = null!;
 
         public string ArmoredKey { get; set; } = null!;
 
@@ -67,7 +67,7 @@ namespace Mautom.Portunus.Entities.DataTransferObjects
                     return Fingerprint;
                 case "HKP":
                     return
-                        $"pub:{Fingerprint}:{Algorithm}:{Length}:{((DateTimeOffset) CreationDate).ToUnixTimeSeconds()}:{((DateTimeOffset) ExpirationDate).ToUnixTimeSeconds()}:{Flags.GetStringValue()}";
+                        $"pub:{Fingerprint}:{Algorithm}:{Length}:{((DateTimeOffset) CreationDate).ToUnixTimeSeconds()}:{(ExpirationDate == null ? string.Empty : ((DateTimeOffset) ExpirationDate).ToUnixTimeSeconds().ToString())}:{Flags.GetStringValue()}";
                 default:
                     throw new FormatException($"The {format} string is not implemented. Use \"G\" or \"HKP\" ");
             }

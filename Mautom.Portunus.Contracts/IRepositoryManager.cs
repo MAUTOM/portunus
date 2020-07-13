@@ -20,6 +20,7 @@ namespace Mautom.Portunus.Contracts
     public interface IRepositoryManager
     {
         IPublicKeyRepository PublicKey { get; }
+        IKeyIdentityRepository KeyIdentity { get; }
         void Save();
     }
 }

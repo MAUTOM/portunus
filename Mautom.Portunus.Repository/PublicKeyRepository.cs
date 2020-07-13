@@ -20,6 +20,7 @@ using System.Linq;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Entities.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Mautom.Portunus.Repository
 {
