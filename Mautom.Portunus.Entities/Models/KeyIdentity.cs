@@ -48,10 +48,6 @@ namespace Mautom.Portunus.Entities.Models
         public string PublicKeyFingerprint { get; set; } = null!;
         
         public PublicKey PublicKey { get; set; } = null!;
-
-        public override string ToString()
-        {
-            return $"{Name} ({Comment}) <{Email}>";
-        }
+        
     }
 }

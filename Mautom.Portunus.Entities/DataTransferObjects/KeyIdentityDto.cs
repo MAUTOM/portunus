@@ -50,7 +50,7 @@ namespace Mautom.Portunus.Entities.DataTransferObjects
             switch (format.ToUpperInvariant())
             {
                 case "G":
-                    return $"{Name} ({Comment}) <{Email}>";
+                    return !string.IsNullOrEmpty(Comment) ? $"{Name} ({Comment}) <{Email}>" : $"{Name} <{Email}>";
                 case "HKP":
                     return
                         $"uid:{Uri.EscapeDataString(ToString())}:{((DateTimeOffset) CreationDate).ToUnixTimeSeconds()}::";
