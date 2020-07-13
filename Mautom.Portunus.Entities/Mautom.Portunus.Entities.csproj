@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <Nullable>enable</Nullable>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.0" />
+      <PackageReference Include="EFCore.NamingConventions" Version="1.1.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.5" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.5" />
+      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Mautom.Portunus.Shared\Mautom.Portunus.Shared.csproj" />
+    </ItemGroup>
+
+</Project>

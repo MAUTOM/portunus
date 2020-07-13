@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NLog" Version="4.7.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Mautom.Portunus.Contracts\Mautom.Portunus.Contracts.csproj" />
+    </ItemGroup>
+
+</Project>
