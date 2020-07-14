@@ -30,6 +30,10 @@ namespace Mautom.Portunus.Repository
         {
             _repoContext = context;
         }
+        
+#if DEBUG
+        public RepositoryContext Context => _repoContext;
+#endif
 
         public IPublicKeyRepository PublicKey => _publicKeyRepository ??= new PublicKeyRepository(_repoContext);
         public IKeyIdentityRepository KeyIdentity => _keyIdentityRepository ??= new KeyIdentityRepository(_repoContext);

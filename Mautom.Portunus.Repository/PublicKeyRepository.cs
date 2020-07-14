@@ -33,12 +33,17 @@ namespace Mautom.Portunus.Repository
 
         public IEnumerable<PublicKey> GetAllPublicKeys(bool trackChanges = true)
         {
-            return FindAll(trackChanges).OrderBy(pk => pk.SubmissionDate).ToList();
+            return FindAll(trackChanges)
+                .OrderBy(pk => pk.SubmissionDate)
+                .Include(pk => pk.KeyIdentities)
+                .ToList();
         }
 
         public PublicKey GetPublicKeyByFingerprint(string fingerprint, bool trackChanges = true)
         {
-            return FindByCondition(key => key.Fingerprint.Equals(fingerprint), trackChanges).FirstOrDefault();
+            return FindByCondition(key => key.Fingerprint.Equals(fingerprint), trackChanges)
+                .Include(pk => pk.KeyIdentities)
+                .FirstOrDefault();
         }
 
         public void CreatePublicKey(PublicKey key)

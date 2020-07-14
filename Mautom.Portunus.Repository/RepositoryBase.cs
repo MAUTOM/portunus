@@ -26,7 +26,7 @@ namespace Mautom.Portunus.Repository
 {
     public abstract class RepositoryBase<T> : IRepositoryBase<T> where T: class
     {
-        public RepositoryContext RepositoryContext { get; set; }
+        protected RepositoryContext RepositoryContext { get; set; }
         
         public RepositoryBase(RepositoryContext repositoryContext)
         {

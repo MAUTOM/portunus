@@ -23,7 +23,7 @@ using Mautom.Portunus.Shared;
 
 namespace Mautom.Portunus.Entities.Models
 {
-    public sealed class PublicKey
+    public class PublicKey
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "Key fingerprint must be specified.")]
         [StringLength(40, MinimumLength = 40, ErrorMessage = "Key fingerprint must be 40 characters long.")]
@@ -45,6 +45,6 @@ namespace Mautom.Portunus.Entities.Models
         public PublicKeyAlgorithm Algorithm { get; set; }
         public PublicKeyLength Length { get; set; }
 
-        public List<KeyIdentity> KeyIdentities { get; set; } = null!;
+        public virtual ICollection<KeyIdentity> KeyIdentities { get; set; } = null!;
     }
 }

@@ -21,7 +21,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Mautom.Portunus.Entities.Models
 {
-    public sealed class KeyIdentity
+    public class KeyIdentity
     {
         [Key]
         public long IdentityId { get; set; }
@@ -43,11 +43,11 @@ namespace Mautom.Portunus.Entities.Models
         
         [Required(ErrorMessage = "User ID creation date must be specified.")]
         public DateTime CreationDate { get; set; }
-
-        [ForeignKey(nameof(PublicKey))] 
+        
         public string PublicKeyFingerprint { get; set; } = null!;
         
-        public PublicKey PublicKey { get; set; } = null!;
+        [ForeignKey(nameof(PublicKeyFingerprint))]
+        public virtual PublicKey PublicKey { get; set; } = null!;
         
     }
 }

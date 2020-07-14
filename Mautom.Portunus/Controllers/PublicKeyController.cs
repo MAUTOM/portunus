@@ -65,8 +65,6 @@ namespace Mautom.Portunus.Controllers
         {
             try
             {
-
-
                 var key = _repository.PublicKey.GetPublicKeyByFingerprint(fingerprint);
 
                 if (key == null)
@@ -74,17 +72,11 @@ namespace Mautom.Portunus.Controllers
                     _logger.LogError($"Cannot find key with fingerprint {fingerprint}");
                     return NotFound();
                 }
-                else
-                {
-                    _logger.LogInfo($"Fetched key {fingerprint}");
-                    var keyResult = _mapper.Map<PublicKeyDto>(key);
-                    keyResult.KeyIdentities = new List<KeyIdentityDto>();
-                    // this fails, TODO key identities are not loaded by EF
-                    foreach(var identity in key.KeyIdentities)
-                        keyResult.KeyIdentities.Add(_mapper.Map<KeyIdentityDto>(identity));
-                    
-                    return Ok(keyResult);
-                }
+
+                _logger.LogInfo($"Fetched key {fingerprint}");
+                var keyResult = _mapper.Map<PublicKeyDto>(key);
+
+                return Ok(keyResult);
             }
             catch (Exception ex)
             {
