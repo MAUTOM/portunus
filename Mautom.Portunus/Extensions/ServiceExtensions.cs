@@ -17,6 +17,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities;
+using Mautom.Portunus.Formatters;
 using Mautom.Portunus.LoggingService;
 using Mautom.Portunus.Repository;
 using Microsoft.AspNetCore.Builder;
@@ -62,5 +63,8 @@ namespace Mautom.Portunus.Extensions
         {
             services.AddScoped<IRepositoryManager, RepositoryManager>();
         }
+
+        public static void AddCustomHkpFormatter(this IMvcBuilder builder) =>
+            builder.AddMvcOptions(config => config.OutputFormatters.Add(new HkpOutputFormatter()));
     }
 }

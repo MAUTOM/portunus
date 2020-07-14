@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Mautom.Portunus.Controllers
 {
-    [Route("api/identities")]
+    [Route("api/publickeys/{publicKeyFingerprint}/identities")]
     [ApiController]
     public class KeyIdentityController : ControllerBase
     {
@@ -21,23 +21,44 @@ namespace Mautom.Portunus.Controllers
             _repository = manager;
             _mapper = mapper;
         }
-        
+    
         [HttpGet]
-        public IActionResult GetAllIdentities()
+        public IActionResult GetIdentitiesForPublicKey(string publicKeyFingerprint)
         {
-            try
-            {
-                var identities = _repository.KeyIdentity.GetAllKeyIdentities();
-                _logger.LogInfo("Fetched all key identities");
-                var identityResult = _mapper.Map<IEnumerable<KeyIdentityDto>>(identities);
+            var key = _repository.PublicKey.GetPublicKeyByFingerprint(publicKeyFingerprint, trackChanges: false);
 
-                return Ok(identityResult);
-            }
-            catch (Exception ex)
+            if (key == null)
             {
-                _logger.LogError($"Something wrong in GetAllIdentities(): {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                _logger.LogInfo($"Key with fingerprint {publicKeyFingerprint} not found in database.");
+                return NotFound();
             }
+
+            var idDto = _mapper.Map<IEnumerable<KeyIdentityDto>>(key.KeyIdentities);
+
+            return Ok(idDto);
+        }
+
+        [HttpGet("{email}")]
+        public IActionResult GetIdentityByEmail(string publicKeyFingerprint, string email)
+        {
+            var key = _repository.PublicKey.GetPublicKeyByFingerprint(publicKeyFingerprint, trackChanges: false);
+
+            if (key == null)
+            {
+                _logger.LogInfo($"Key with fingerprint {publicKeyFingerprint} not found in database.");
+                return NotFound();
+            }
+
+            var identity = _repository.KeyIdentity.GetIdentityByEmail(publicKeyFingerprint, email, trackChanges: false);
+            if (identity == null)
+            {
+                _logger.LogInfo($"Identity with email {email} does not exist for key {publicKeyFingerprint} in database.");
+                return NotFound();
+            }
+
+            var idDto = _mapper.Map<KeyIdentityDto>(identity);
+
+            return Ok(idDto);
         }
     }
 }

@@ -15,12 +15,16 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using AutoMapper;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities.DataTransferObjects;
 using Mautom.Portunus.Entities.Models;
+using Mautom.Portunus.Formatters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mautom.Portunus.Controllers
@@ -32,7 +36,7 @@ namespace Mautom.Portunus.Controllers
         private readonly ILoggerManager _logger;
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
-        
+
         // GET
         public PublicKeyController(ILoggerManager logger, IRepositoryManager manager, IMapper mapper)
         {
@@ -40,81 +44,68 @@ namespace Mautom.Portunus.Controllers
             _repository = manager;
             _mapper = mapper;
         }
-        
-        [HttpGet]
-        public IActionResult GetAllPublicKeys()
-        {
-            try
-            {
-                var pubKeys = _repository.PublicKey.GetAllPublicKeys();
-                _logger.LogInfo("Fetched all public keys from database");
 
-                var pubKeyResult = _mapper.Map<IEnumerable<PublicKeyDto>>(pubKeys);
-                
-                return Ok(pubKeyResult);
-            }
-            catch (Exception ex)
+        [HttpGet]
+        public IActionResult GetAllPublicKeys([FromQuery] bool hkp = false)
+        {
+            var pubKeys = _repository.PublicKey.GetAllPublicKeys();
+            _logger.LogInfo("Fetched all public keys from database");
+
+            var pubKeyResult = _mapper.Map<IEnumerable<PublicKeyDto>>(pubKeys);
+
+            if (hkp)
             {
-                _logger.LogError($"Something went wrong in GetAllPublicKeys(): {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                var result = new StringBuilder();
+                var publicKeyDtos = pubKeyResult.ToList();
+                result.AppendLine($"info:1:{publicKeyDtos.Count}");
+                foreach(var key in publicKeyDtos)
+                    HkpOutputFormatter.FormatHkpPublicKey(result, key);
+
+                return Content(result.ToString());
             }
+
+            return Ok(pubKeyResult);
         }
-        
+
         [HttpGet("{fingerprint}", Name = "PublicKeyByFingerprint")]
         public IActionResult GetPublicKeyByFingerprint(string fingerprint)
         {
-            try
+            var key = _repository.PublicKey.GetPublicKeyByFingerprint(fingerprint);
+
+            if (key == null)
             {
-                var key = _repository.PublicKey.GetPublicKeyByFingerprint(fingerprint);
-
-                if (key == null)
-                {
-                    _logger.LogError($"Cannot find key with fingerprint {fingerprint}");
-                    return NotFound();
-                }
-
-                _logger.LogInfo($"Fetched key {fingerprint}");
-                var keyResult = _mapper.Map<PublicKeyDto>(key);
-
-                return Ok(keyResult);
+                _logger.LogError($"Cannot find key with fingerprint {fingerprint}");
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Something went wrong inside GetPublicKeyByFingerprint: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
-            }
+
+            _logger.LogInfo($"Fetched key {fingerprint}");
+            var keyResult = _mapper.Map<PublicKeyDto>(key);
+
+            return Ok(keyResult);
         }
 
         [HttpPost]
         public IActionResult CreatePublicKey([FromBody] PublicKeyForCreationDto key)
         {
-            try
+            if (key == null)
             {
-                if (key == null)
-                {
-                    _logger.LogError("Public key object received from client is NULL!");
-                    return BadRequest("Public key is NULL!");
-                }
-
-                if (!ModelState.IsValid)
-                {
-                    _logger.LogError("Invalid object received from client.");
-                    return BadRequest("Invalid model object.");
-                }
-
-                var keyEntity = _mapper.Map<PublicKey>(key);
-                _repository.PublicKey.CreatePublicKey(keyEntity);
-                _repository.Save();
-
-                var createdKey = _mapper.Map<PublicKeyDto>(keyEntity);
-
-                return CreatedAtRoute("PublicKeyByFingerprint", new {Fingerprint = createdKey.Fingerprint}, createdKey);
+                _logger.LogError("Public key object received from client is NULL!");
+                return BadRequest("Public key is NULL!");
             }
-            catch (Exception ex)
+
+            if (!ModelState.IsValid)
             {
-                _logger.LogError($"Something went wrong inside CreatePublicKey: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
+                _logger.LogError("Invalid object received from client.");
+                return BadRequest("Invalid model object.");
             }
+
+            var keyEntity = _mapper.Map<PublicKey>(key);
+            _repository.PublicKey.CreatePublicKey(keyEntity);
+            _repository.Save();
+
+            var createdKey = _mapper.Map<PublicKeyDto>(keyEntity);
+
+            return CreatedAtRoute("PublicKeyByFingerprint", new {Fingerprint = createdKey.Fingerprint}, createdKey);
         }
     }
 }

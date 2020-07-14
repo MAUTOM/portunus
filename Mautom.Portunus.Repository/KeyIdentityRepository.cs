@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mautom.Portunus.Contracts;
@@ -13,10 +14,18 @@ namespace Mautom.Portunus.Repository
             return FindAll(trackChanges).OrderBy(identity => identity.IdentityId).ToList();
         }
 
-        public IEnumerable<KeyIdentity> GetIdentitiesByFingerprint(string fingerprint, bool trackChanges = true)
-        {
-            throw new System.NotImplementedException();
-        }
+        public IEnumerable<KeyIdentity> GetIdentities(string fingerprint, bool trackChanges = true) =>
+            FindByCondition(id =>
+                    id.PublicKeyFingerprint.Equals(fingerprint, StringComparison.InvariantCultureIgnoreCase), trackChanges)
+                .OrderBy(id => id.IdentityId);
+
+        public KeyIdentity GetIdentityByEmail(string fingerprint, string email, bool trackChanges = true) =>
+            FindByCondition(
+                    identity =>
+                        identity.PublicKeyFingerprint.Equals(fingerprint,
+                            StringComparison.InvariantCultureIgnoreCase) &&
+                        identity.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase), trackChanges)
+                .SingleOrDefault();
 
         public void CreateKeyIdentity(KeyIdentity key)
         {
