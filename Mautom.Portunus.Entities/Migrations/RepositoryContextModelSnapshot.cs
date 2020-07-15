@@ -47,7 +47,7 @@ namespace Mautom.Portunus.Entities.Migrations
                     b.Property<string>("PublicKeyFingerprint")
                         .IsRequired()
                         .HasColumnName("public_key_fingerprint")
-                        .HasColumnType("varchar(40) CHARACTER SET utf8mb4");
+                        .HasColumnType("varchar(40)");
 
                     b.HasKey("IdentityId")
                         .HasName("pk_key_identities");
@@ -80,8 +80,7 @@ namespace Mautom.Portunus.Entities.Migrations
                 {
                     b.Property<string>("Fingerprint")
                         .HasColumnName("fingerprint")
-                        .HasColumnType("varchar(40) CHARACTER SET utf8mb4")
-                        .HasMaxLength(40);
+                        .HasColumnType("varchar(40)");
 
                     b.Property<int>("Algorithm")
                         .HasColumnName("algorithm")

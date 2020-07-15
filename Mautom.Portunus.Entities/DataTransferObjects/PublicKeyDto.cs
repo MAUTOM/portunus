@@ -19,12 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Mautom.Portunus.Shared;
+using Mautom.Portunus.Shared.Pgp;
 
 namespace Mautom.Portunus.Entities.DataTransferObjects
 {
     public sealed class PublicKeyDto : IFormattable
     {
-        public string Fingerprint { get; set; } = null!;
+        public PublicKeyFingerprint Fingerprint { get; set; } = null!;
 
         public List<KeyIdentityDto> KeyIdentities { get; set; } = null!;
 

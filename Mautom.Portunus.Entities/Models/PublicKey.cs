@@ -20,16 +20,17 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Mautom.Portunus.Shared;
+using Mautom.Portunus.Shared.Pgp;
 
 namespace Mautom.Portunus.Entities.Models
 {
     public class PublicKey
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "Key fingerprint must be specified.")]
-        [StringLength(40, MinimumLength = 40, ErrorMessage = "Key fingerprint must be 40 characters long.")]
+        [Column(TypeName = "varchar(40)")]
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string Fingerprint { get; set; } = null!;
+        public PublicKeyFingerprint Fingerprint { get; set; } = null!;
         
         [Required(AllowEmptyStrings = false, ErrorMessage = "No public key data!")]
         [DataType(DataType.Text)]

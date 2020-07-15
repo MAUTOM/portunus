@@ -36,13 +36,12 @@ namespace Mautom.Portunus.Controllers
         private readonly ILoggerManager _logger;
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
-
-        // GET
+        
         public PublicKeyController(ILoggerManager logger, IRepositoryManager manager, IMapper mapper)
         {
             _logger = logger;
             _repository = manager;
-            _mapper = mapper;
+            _mapper = mapper; 
         }
 
         [HttpGet]

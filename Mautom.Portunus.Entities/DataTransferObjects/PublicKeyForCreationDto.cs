@@ -18,13 +18,14 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using Mautom.Portunus.Shared;
+using Mautom.Portunus.Shared.Pgp;
 
 namespace Mautom.Portunus.Entities.DataTransferObjects
 {
     public sealed class PublicKeyForCreationDto
     {
         [Required(ErrorMessage = "Fingerprint required!")]
-        public string Fingerprint { get; set; } = null!;
+        public PublicKeyFingerprint Fingerprint { get; set; } = null!;
         
         [Required(ErrorMessage = "Name for public key is required!")]
         [StringLength(50, ErrorMessage = "Name must not exceed 50 characters.")]

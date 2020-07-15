@@ -18,6 +18,7 @@
 using System;
 using Mautom.Portunus.Entities.Models;
 using Mautom.Portunus.Shared;
+using Mautom.Portunus.Shared.Pgp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

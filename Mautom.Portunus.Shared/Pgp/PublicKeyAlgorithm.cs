@@ -15,12 +15,28 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
-namespace Mautom.Portunus.Shared
+namespace Mautom.Portunus.Shared.Pgp
 {
-    public enum PublicKeyLength
+    /// <summary>
+    /// Available public key algorithms in OpenPGP as per RFC 4880.
+    /// </summary>
+    public enum PublicKeyAlgorithm
     {
-        KeyLength1024 = 1024,
-        KeyLength2048 = 2048,
-        KeyLength4096 = 4096
+        [StringValue("rsa")]
+        RsaEs = 1,
+        [StringValue("rsa")]
+        RsaE = 2,
+        [StringValue("rsa")]
+        RsaS = 3,
+        [StringValue("elgamal")]
+        Elgamal = 16,
+        [StringValue("dsa")]
+        Dsa = 17,
+        [StringValue("ecc")]
+        EllipticCurve = 18,
+        [StringValue("ecdsa")]
+        Ecdsa = 19,
+        [StringValue("diffie-hellman")]
+        DiffieHellman = 21
     }
 }

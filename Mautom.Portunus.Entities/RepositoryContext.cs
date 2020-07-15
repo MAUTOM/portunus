@@ -18,6 +18,7 @@
 using Mautom.Portunus.Entities.Configuration;
 using Mautom.Portunus.Entities.Models;
 using Mautom.Portunus.Shared;
+using Mautom.Portunus.Shared.Pgp;
 using Microsoft.EntityFrameworkCore;
 
 namespace Mautom.Portunus.Entities
@@ -37,6 +38,14 @@ namespace Mautom.Portunus.Entities
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<PublicKey>()
+                .Property(k => k.Fingerprint)
+                .HasConversion(fp => fp.Fingerprint, fp => new PublicKeyFingerprint(fp));
+            
+            modelBuilder.Entity<KeyIdentity>()
+                .Property(k => k.PublicKeyFingerprint)
+                .HasConversion(fp => fp.Fingerprint, fp => new PublicKeyFingerprint(fp));
             
             modelBuilder.Entity<PublicKey>()
                 .Property((k) => k.SubmissionDate)

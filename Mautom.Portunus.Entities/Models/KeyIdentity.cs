@@ -18,6 +18,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Mautom.Portunus.Shared.Pgp;
 
 namespace Mautom.Portunus.Entities.Models
 {
@@ -44,7 +45,8 @@ namespace Mautom.Portunus.Entities.Models
         [Required(ErrorMessage = "User ID creation date must be specified.")]
         public DateTime CreationDate { get; set; }
         
-        public string PublicKeyFingerprint { get; set; } = null!;
+        [Column(TypeName = "varchar(40)")]
+        public PublicKeyFingerprint PublicKeyFingerprint { get; set; } = null!;
         
         [ForeignKey(nameof(PublicKeyFingerprint))]
         public virtual PublicKey PublicKey { get; set; } = null!;

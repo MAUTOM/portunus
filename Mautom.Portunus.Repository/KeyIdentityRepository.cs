@@ -16,14 +16,13 @@ namespace Mautom.Portunus.Repository
 
         public IEnumerable<KeyIdentity> GetIdentities(string fingerprint, bool trackChanges = true) =>
             FindByCondition(id =>
-                    id.PublicKeyFingerprint.Equals(fingerprint, StringComparison.InvariantCultureIgnoreCase), trackChanges)
+                    id.PublicKeyFingerprint.Equals(fingerprint), trackChanges)
                 .OrderBy(id => id.IdentityId);
 
         public KeyIdentity GetIdentityByEmail(string fingerprint, string email, bool trackChanges = true) =>
             FindByCondition(
                     identity =>
-                        identity.PublicKeyFingerprint.Equals(fingerprint,
-                            StringComparison.InvariantCultureIgnoreCase) &&
+                        identity.PublicKeyFingerprint.Equals(fingerprint) &&
                         identity.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase), trackChanges)
                 .SingleOrDefault();
 

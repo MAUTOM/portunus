@@ -1,20 +1,3 @@
-// Copyright (c) 2020 Bence Horváth <horvath.bence@mautom.hu>.
-//
-// This file is part of Portunus OpenPGP key server 
-// (see https://www.horvathb.dev/portunus).
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -29,7 +12,7 @@ namespace Mautom.Portunus.Entities.Migrations
                 name: "public_keys",
                 columns: table => new
                 {
-                    fingerprint = table.Column<string>(maxLength: 40, nullable: false),
+                    fingerprint = table.Column<string>(type: "varchar(40)", nullable: false),
                     armored_key = table.Column<string>(nullable: false),
                     submission_date = table.Column<DateTime>(nullable: false, defaultValueSql: "now()"),
                     creation_date = table.Column<DateTime>(nullable: false),
@@ -53,7 +36,7 @@ namespace Mautom.Portunus.Entities.Migrations
                     email = table.Column<string>(nullable: false),
                     comment = table.Column<string>(maxLength: 200, nullable: true),
                     creation_date = table.Column<DateTime>(nullable: false),
-                    public_key_fingerprint = table.Column<string>(nullable: false)
+                    public_key_fingerprint = table.Column<string>(type: "varchar(40)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -364,12 +347,12 @@ IMNgaG75uJaVS3Z787pEWteuiKyRb/H/JQ==
             migrationBuilder.InsertData(
                 table: "key_identities",
                 columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint" },
-                values: new object[] { -1L, string.Empty, new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.bence@muszerautomatika.hu", "Bence Horváth", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0" });
+                values: new object[] { -1L, null, new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.bence@muszerautomatika.hu", "Bence Horváth", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0" });
 
             migrationBuilder.InsertData(
                 table: "key_identities",
                 columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint" },
-                values: new object[] { -2L, string.Empty, new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.gabor@muszerautomatika.hu", "Gábor Horváth", "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360" });
+                values: new object[] { -2L, null, new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.gabor@muszerautomatika.hu", "Gábor Horváth", "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_key_identities_public_key_fingerprint",
