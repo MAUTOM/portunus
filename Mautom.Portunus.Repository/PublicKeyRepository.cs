@@ -15,11 +15,14 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Entities.Models;
+using Mautom.Portunus.Shared.Pgp;
 using Microsoft.EntityFrameworkCore;
 
 namespace Mautom.Portunus.Repository
@@ -41,9 +44,23 @@ namespace Mautom.Portunus.Repository
 
         public PublicKey GetPublicKeyByFingerprint(string fingerprint, bool trackChanges = true)
         {
-            return FindByCondition(key => key.Fingerprint.Equals(fingerprint), trackChanges)
+            return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(fingerprint)), trackChanges)
+                .Include(pk => pk.KeyIdentities)
+                .SingleOrDefault();
+        }
+
+        public PublicKey GetPublicKeyByLongKeyId(string keyId, bool trackChanges = true)
+        {
+            return FindByCondition(
+                    key => key.Fingerprint.LongKeyId.Equals(keyId, StringComparison.InvariantCultureIgnoreCase),
+                    trackChanges)
                 .Include(pk => pk.KeyIdentities)
                 .FirstOrDefault();
+        }
+
+        public PublicKey GetPublicKeyByShortKeyId(string keyId, bool trackChanges = true)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void CreatePublicKey(PublicKey key)

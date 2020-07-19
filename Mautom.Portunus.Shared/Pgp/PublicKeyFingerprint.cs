@@ -3,16 +3,17 @@ using System.Globalization;
 
 namespace Mautom.Portunus.Shared.Pgp
 {
-    public sealed class PublicKeyFingerprint : IFormattable, IEquatable<PublicKeyFingerprint>, IEquatable<string>
+    public sealed class PublicKeyFingerprint : IFormattable, IEquatable<PublicKeyFingerprint>
     {
-        private readonly string _fingerprint;
+        private string _fingerprint = string.Empty;
         
         public string Fingerprint
         {
-            get
+            get => _fingerprint.ToUpperInvariant();
+            private set
             {
-                ValidateFingerprint();
-                return _fingerprint.ToUpperInvariant();
+                ValidateFingerprint(value);
+                _fingerprint = value.ToUpperInvariant();
             }
         }
 
@@ -27,9 +28,7 @@ namespace Mautom.Portunus.Shared.Pgp
         
         public PublicKeyFingerprint(string fingerprint)
         {
-            ValidateFingerprint(fingerprint);
-
-            _fingerprint = fingerprint.ToUpperInvariant();
+            Fingerprint = fingerprint;
         }
         
         public static implicit operator PublicKeyFingerprint(string fingerprint)
@@ -68,6 +67,8 @@ namespace Mautom.Portunus.Shared.Pgp
                         string.Format("{0} {1} {2} {3} {4} {5} {6}", Fingerprint.Substring(0, 4),
                             Fingerprint.Substring(4, 4), Fingerprint.Substring(8, 4), Fingerprint.Substring(16, 4),
                             Fingerprint.Substring(24, 4), Fingerprint.Substring(32, 4), Fingerprint.Substring(36, 4));
+                case "X":
+                    return $"0x{Fingerprint}";
                 default:
                     throw new FormatException($"The {format} string is not implemented. Use \"G\" or \"FP\" ");
             }
@@ -79,12 +80,7 @@ namespace Mautom.Portunus.Shared.Pgp
             if (ReferenceEquals(this, other)) return true;
             return string.Equals(Fingerprint, other.Fingerprint, StringComparison.InvariantCultureIgnoreCase);
         }
-
-        public bool Equals(string other)
-        {
-            return string.Equals(Fingerprint, other, StringComparison.InvariantCultureIgnoreCase);
-        }
-
+        
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is PublicKeyFingerprint other && Equals(other);

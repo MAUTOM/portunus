@@ -347,12 +347,12 @@ IMNgaG75uJaVS3Z787pEWteuiKyRb/H/JQ==
             migrationBuilder.InsertData(
                 table: "key_identities",
                 columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint" },
-                values: new object[] { -1L, null, new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.bence@muszerautomatika.hu", "Bence Horváth", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0" });
+                values: new object[] { -1L, string.Empty, new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.bence@muszerautomatika.hu", "Bence Horváth", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0" });
 
             migrationBuilder.InsertData(
                 table: "key_identities",
                 columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint" },
-                values: new object[] { -2L, null, new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.gabor@muszerautomatika.hu", "Gábor Horváth", "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360" });
+                values: new object[] { -2L, string.Empty, new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.gabor@muszerautomatika.hu", "Gábor Horváth", "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_key_identities_public_key_fingerprint",

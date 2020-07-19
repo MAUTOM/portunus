@@ -24,6 +24,8 @@ namespace Mautom.Portunus.Contracts
     {
         IEnumerable<PublicKey> GetAllPublicKeys(bool trackChanges = true);
         PublicKey GetPublicKeyByFingerprint(string fingerprint, bool trackChanges = true);
+        PublicKey GetPublicKeyByLongKeyId(string keyId, bool trackChanges = true);
+        PublicKey GetPublicKeyByShortKeyId(string keyId, bool trackChanges = true);
         void CreatePublicKey(PublicKey key);
     }
 }

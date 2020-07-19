@@ -20,6 +20,7 @@ using Mautom.Portunus.Entities.Models;
 using Mautom.Portunus.Shared;
 using Mautom.Portunus.Shared.Pgp;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Mautom.Portunus.Entities
 {
@@ -38,14 +39,16 @@ namespace Mautom.Portunus.Entities
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            var fpConverter =
+                new ValueConverter<PublicKeyFingerprint, string>(fp => fp.ToString(), s => new PublicKeyFingerprint(s));
+            
             modelBuilder.Entity<PublicKey>()
                 .Property(k => k.Fingerprint)
-                .HasConversion(fp => fp.Fingerprint, fp => new PublicKeyFingerprint(fp));
+                .HasConversion(fpConverter);
             
             modelBuilder.Entity<KeyIdentity>()
                 .Property(k => k.PublicKeyFingerprint)
-                .HasConversion(fp => fp.Fingerprint, fp => new PublicKeyFingerprint(fp));
+                .HasConversion(fpConverter);
             
             modelBuilder.Entity<PublicKey>()
                 .Property((k) => k.SubmissionDate)
