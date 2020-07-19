@@ -45,24 +45,13 @@ namespace Mautom.Portunus.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllPublicKeys([FromQuery] bool hkp = false)
+        public IActionResult GetAllPublicKeys()
         {
             var pubKeys = _repository.PublicKey.GetAllPublicKeys();
             _logger.LogInfo("Fetched all public keys from database");
 
             var pubKeyResult = _mapper.Map<IEnumerable<PublicKeyDto>>(pubKeys);
-
-            if (hkp)
-            {
-                var result = new StringBuilder();
-                var publicKeyDtos = pubKeyResult.ToList();
-                result.AppendLine($"info:1:{publicKeyDtos.Count}");
-                foreach(var key in publicKeyDtos)
-                    HkpOutputFormatter.FormatHkpPublicKey(result, key);
-
-                return Content(result.ToString());
-            }
-
+            
             return Ok(pubKeyResult);
         }
 

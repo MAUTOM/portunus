@@ -42,14 +42,14 @@ namespace Mautom.Portunus.Repository
                 .ToList();
         }
 
-        public PublicKey GetPublicKeyByFingerprint(string fingerprint, bool trackChanges = true)
+        public PublicKey? GetPublicKeyByFingerprint(string fingerprint, bool trackChanges = true)
         {
             return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(fingerprint)), trackChanges)
                 .Include(pk => pk.KeyIdentities)
                 .SingleOrDefault();
         }
 
-        public PublicKey GetPublicKeyByLongKeyId(string keyId, bool trackChanges = true)
+        public PublicKey? GetPublicKeyByLongKeyId(string keyId, bool trackChanges = true)
         {
             return FindByCondition(
                     key => key.Fingerprint.LongKeyId.Equals(keyId, StringComparison.InvariantCultureIgnoreCase),
@@ -58,11 +58,11 @@ namespace Mautom.Portunus.Repository
                 .FirstOrDefault();
         }
 
-        public PublicKey GetPublicKeyByShortKeyId(string keyId, bool trackChanges = true)
+        public PublicKey? GetPublicKeyByShortKeyId(string keyId, bool trackChanges = true)
         {
             throw new System.NotImplementedException();
         }
-
+        
         public void CreatePublicKey(PublicKey key)
         {
             Create(key);

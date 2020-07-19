@@ -18,11 +18,12 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using Mautom.Portunus.Shared.Pgp;
 
 namespace Mautom.Portunus.Entities.Models
 {
-    public class KeyIdentity
+    public class KeyIdentity : IFormattable
     {
         [Key]
         public long IdentityId { get; set; }
@@ -51,5 +52,35 @@ namespace Mautom.Portunus.Entities.Models
         [ForeignKey(nameof(PublicKeyFingerprint))]
         public virtual PublicKey PublicKey { get; set; } = null!;
         
+        #region IFormattable implementation
+        
+        public override string ToString()
+        {
+            return ToString("G", CultureInfo.CurrentCulture);
+        }
+
+        public string ToString(string format)
+        {
+            return ToString(format, CultureInfo.CurrentCulture);
+        }
+        
+        public string ToString(string? format, IFormatProvider? formatProvider)
+        {
+            if (string.IsNullOrEmpty(format)) format = "G";
+            formatProvider ??= CultureInfo.CurrentCulture;
+
+            switch (format.ToUpperInvariant())
+            {
+                case "G":
+                    return !string.IsNullOrEmpty(Comment) ? $"{Name} ({Comment}) <{Email}>" : $"{Name} <{Email}>";
+                case "HKP":
+                    return
+                        $"uid:{Uri.EscapeDataString(ToString())}:{((DateTimeOffset) CreationDate).ToUnixTimeSeconds()}::";
+                default:
+                    throw new FormatException($"The {format} string is not implemented. Use \"G\" or \"HKP\" ");
+            }
+        }
+        
+        #endregion
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Entities.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Mautom.Portunus.Repository
 {
@@ -19,7 +20,27 @@ namespace Mautom.Portunus.Repository
                     id.PublicKeyFingerprint.Equals(fingerprint), trackChanges)
                 .OrderBy(id => id.IdentityId);
 
-        public KeyIdentity GetIdentityByEmail(string fingerprint, string email, bool trackChanges = true) =>
+        public IEnumerable<KeyIdentity> SearchIdentities(string searchPattern, bool exact = false, bool trackChanges = true)
+        {
+            if(!exact)
+                return FindByCondition(id => id.Name.Contains(searchPattern) 
+                                             || id.Email.Contains(searchPattern) 
+                                             || (id.Comment != null && id.Comment.Contains(searchPattern)), false)
+                .OrderBy(id => id.Name)
+                .Include(id => id.PublicKey);
+            else
+            {
+                return FindByCondition(id => id.Name.Equals(searchPattern, StringComparison.InvariantCultureIgnoreCase)
+                                             || id.Email.Equals(searchPattern,
+                                                 StringComparison.InvariantCultureIgnoreCase)
+                                             || (id.Comment != null && id.Comment.Equals(searchPattern,
+                                                 StringComparison.InvariantCultureIgnoreCase)), trackChanges)
+                    .OrderBy(id => id.Name)
+                    .Include(id => id.PublicKey);
+            }
+        }
+
+        public KeyIdentity? GetIdentityByEmail(string fingerprint, string email, bool trackChanges = true) =>
             FindByCondition(
                     identity =>
                         identity.PublicKeyFingerprint.Equals(fingerprint) &&
