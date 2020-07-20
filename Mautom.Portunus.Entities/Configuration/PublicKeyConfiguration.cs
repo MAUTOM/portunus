@@ -28,6 +28,9 @@ namespace Mautom.Portunus.Entities.Configuration
     {
         public void Configure(EntityTypeBuilder<PublicKey> builder)
         {
+            var fprintHb = new PublicKeyFingerprint("33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0");
+            var fprintHg = new PublicKeyFingerprint("1FDA0F756C0A2A78775CBC7BFA0060473ACD2360");
+            
             builder.HasData
             (
                 new PublicKey
@@ -184,7 +187,9 @@ YVrS4cwj9jHTRpT4And6p3fJdOMT1/FVFWz7wUmbRKHF/wBEyF9wrOHv
 ",
                     CreationDate = new DateTime(year: 2020, month: 6, day: 18),
                     ExpirationDate = new DateTime(year: 2021, month: 6, day: 18),
-                    Fingerprint = "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0",
+                    Fingerprint = fprintHb,
+                    LongKeyId = fprintHb.LongKeyId,
+                    ShortKeyId = fprintHb.ShortKeyId,
                     Algorithm = PublicKeyAlgorithm.RsaEs,
                     Length = PublicKeyLength.KeyLength4096
                 },
@@ -329,7 +334,9 @@ IMNgaG75uJaVS3Z787pEWteuiKyRb/H/JQ==
 ",
                     CreationDate = new DateTime(year: 2020, month: 6, day: 22),
                     ExpirationDate = new DateTime(year: 2021, month: 6, day: 22),
-                    Fingerprint = "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360",
+                    Fingerprint = fprintHg,
+                    LongKeyId = fprintHg.LongKeyId,
+                    ShortKeyId = fprintHg.ShortKeyId,
                     Algorithm = PublicKeyAlgorithm.RsaEs,
                     Length = PublicKeyLength.KeyLength4096
                 }

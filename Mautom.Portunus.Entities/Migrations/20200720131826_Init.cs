@@ -13,6 +13,8 @@ namespace Mautom.Portunus.Entities.Migrations
                 columns: table => new
                 {
                     fingerprint = table.Column<string>(type: "varchar(40)", nullable: false),
+                    long_key_id = table.Column<string>(nullable: false),
+                    short_key_id = table.Column<string>(nullable: false),
                     armored_key = table.Column<string>(nullable: false),
                     submission_date = table.Column<DateTime>(nullable: false, defaultValueSql: "now()"),
                     creation_date = table.Column<DateTime>(nullable: false),
@@ -51,7 +53,7 @@ namespace Mautom.Portunus.Entities.Migrations
 
             migrationBuilder.InsertData(
                 table: "public_keys",
-                columns: new[] { "fingerprint", "algorithm", "armored_key", "creation_date", "expiration_date", "length" },
+                columns: new[] { "fingerprint", "algorithm", "armored_key", "creation_date", "expiration_date", "length", "long_key_id", "short_key_id" },
                 values: new object[] { "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0", 1, @"-----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mQINBF7rhpIBEACq5Hb+GPA9fXai2wHJpYzEn/EPM/roNcMJ0aT+VhZ8XQfQomVw
@@ -201,11 +203,11 @@ CWtHrTI0ooL3GKB4b1A2Pw1htUoKVfX/sTKWzB1tadS1YjrvFtc2FIxi33lBljOw
 YVrS4cwj9jHTRpT4And6p3fJdOMT1/FVFWz7wUmbRKHF/wBEyF9wrOHv
 =Sxbn
 -----END PGP PUBLIC KEY BLOCK-----
-", new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2021, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), 4096 });
+", new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2021, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), 4096, "E4C22D9F57CBD3F0", "57CBD3F0" });
 
             migrationBuilder.InsertData(
                 table: "public_keys",
-                columns: new[] { "fingerprint", "algorithm", "armored_key", "creation_date", "expiration_date", "length" },
+                columns: new[] { "fingerprint", "algorithm", "armored_key", "creation_date", "expiration_date", "length", "long_key_id", "short_key_id" },
                 values: new object[] { "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360", 1, @"-----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mQINBF7ws54BEAD3f/GU2CK7CFdTI2kICI/0ji1K/k2JBrZUKm0CDqxD8j+OBKJv
@@ -342,17 +344,17 @@ I9WeMq3GtkoESEVQI4O8gnoWueWFPUa8jM4+ewGQXmRoKpGRR+Zoeyzo8fHTwN8N
 IMNgaG75uJaVS3Z787pEWteuiKyRb/H/JQ==
 =+IcE
 -----END PGP PUBLIC KEY BLOCK-----
-", new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2021, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), 4096 });
+", new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2021, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), 4096, "FA0060473ACD2360", "3ACD2360" });
 
             migrationBuilder.InsertData(
                 table: "key_identities",
                 columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint" },
-                values: new object[] { -1L, string.Empty, new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.bence@muszerautomatika.hu", "Bence Horváth", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0" });
+                values: new object[] { -1L, null, new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.bence@muszerautomatika.hu", "Bence Horváth", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0" });
 
             migrationBuilder.InsertData(
                 table: "key_identities",
                 columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint" },
-                values: new object[] { -2L, string.Empty, new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.gabor@muszerautomatika.hu", "Gábor Horváth", "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360" });
+                values: new object[] { -2L, null, new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.gabor@muszerautomatika.hu", "Gábor Horváth", "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360" });
 
             migrationBuilder.CreateIndex(
                 name: "ix_key_identities_public_key_fingerprint",

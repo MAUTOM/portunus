@@ -14,7 +14,7 @@ namespace Mautom.Portunus.Entities.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Mautom.Portunus.Entities.Models.KeyIdentity", b =>
@@ -108,6 +108,16 @@ namespace Mautom.Portunus.Entities.Migrations
                     b.Property<int>("Length")
                         .HasColumnName("length")
                         .HasColumnType("int");
+
+                    b.Property<string>("LongKeyId")
+                        .IsRequired()
+                        .HasColumnName("long_key_id")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("ShortKeyId")
+                        .IsRequired()
+                        .HasColumnName("short_key_id")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<DateTime>("SubmissionDate")
                         .ValueGeneratedOnAdd()
@@ -279,6 +289,8 @@ YVrS4cwj9jHTRpT4And6p3fJdOMT1/FVFWz7wUmbRKHF/wBEyF9wrOHv
                             ExpirationDate = new DateTime(2021, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Flags = 0,
                             Length = 4096,
+                            LongKeyId = "E4C22D9F57CBD3F0",
+                            ShortKeyId = "57CBD3F0",
                             SubmissionDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
@@ -426,6 +438,8 @@ IMNgaG75uJaVS3Z787pEWteuiKyRb/H/JQ==
                             ExpirationDate = new DateTime(2021, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Flags = 0,
                             Length = 4096,
+                            LongKeyId = "FA0060473ACD2360",
+                            ShortKeyId = "3ACD2360",
                             SubmissionDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });

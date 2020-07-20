@@ -59,6 +59,8 @@ namespace Mautom.Portunus.Entities
                 .HasDefaultValue(PublicKeyFlags.None);
             
             
+
+
             // seed
             modelBuilder.ApplyConfiguration(new PublicKeyConfiguration());
             modelBuilder.ApplyConfiguration(new KeyIdentityConfiguration());

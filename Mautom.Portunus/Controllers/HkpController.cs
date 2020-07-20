@@ -45,23 +45,11 @@ namespace Mautom.Portunus.Controllers
                         search = search.Trim('\n', '\r');
                         search = search.Remove(0, 2);
                         _logger.LogInfo($"Searching for {search}");
-                        PublicKey? key = null;
-                        if (search.Length == 40)
-                        {
-                            key = _repository.PublicKey.GetPublicKeyByFingerprint(search, false);
-                        }
-                        else if (search.Length == 16 || search.Length == 8)
-                        {
-                            // TODO: maybe add short and long key IDs to a separate DB field upon key insertion, so that it is queryable here
-                            // TODO cont: EF Core cannot setup a query for a runtime computed value, so we fetch everything and use LINQ
-                            var keys = _repository.PublicKey.GetAllPublicKeys(trackChanges: false);
 
-                            key = keys.FirstOrDefault(k =>
-                                k.Fingerprint.LongKeyId.Equals(search, StringComparison.InvariantCultureIgnoreCase) ||
-                                k.Fingerprint.ShortKeyId.Equals(search, StringComparison.InvariantCultureIgnoreCase));
-                        }
-                        else
-                            return StatusCode(501, "Not Implemented");
+                        if (search.Length != 40 && search.Length != 16 && search.Length != 8)
+                            return BadRequest();
+
+                        var key = _repository.PublicKey.GetPublicKeyByKeyId(search, false);
 
                         if (key == null)
                             return NotFound();
@@ -104,24 +92,18 @@ namespace Mautom.Portunus.Controllers
                         if (search.Length != 40 && search.Length != 16 && search.Length != 8)
                             return StatusCode(501, "Not Implemented");
                         
-                        // TODO: optimize: don't get all keys here
-                        
-                        var keys = _repository.PublicKey.GetAllPublicKeys(false)
-                            .Where(pk =>
-                                pk.Fingerprint.Fingerprint.Equals(search, StringComparison.InvariantCultureIgnoreCase)
-                                || pk.Fingerprint.LongKeyId.Equals(search, StringComparison.InvariantCultureIgnoreCase)
-                                || pk.Fingerprint.ShortKeyId.Equals(search,
-                                    StringComparison.InvariantCultureIgnoreCase));
+                        // should be only one key with any ID
 
-                        var pubKeyResult = _mapper.Map<IEnumerable<PublicKeyDto>>(keys).ToList();
+                        var key = _repository.PublicKey.GetPublicKeyByKeyId(search, false);
+                        
+                        var pubKeyResult = _mapper.Map<PublicKeyDto>(key);
 
                         if (options.Contains("mr"))
                         {
                             var result = new StringBuilder();
-                            result.AppendLine($"info:1:{pubKeyResult.Count}");
-
-                            foreach (var key in pubKeyResult)
-                                HkpOutputFormatter.FormatHkpPublicKey(result, key);
+                            result.AppendLine("info:1:1");
+                            
+                            HkpOutputFormatter.FormatHkpPublicKey(result, pubKeyResult);
 
                             return Content(result.ToString(), "text/plain");
                         }
@@ -156,6 +138,36 @@ namespace Mautom.Portunus.Controllers
                 default:
                     return BadRequest();
             }
+        }
+
+        [Route("/pks/add")]
+        [HttpPost]
+        [Consumes("text/plain")]
+        public IActionResult SubmitKey([FromBody] string keytext)
+        {
+            if (string.IsNullOrEmpty(keytext))
+                return BadRequest();
+
+            return StatusCode(501, "Not Implemented");
+        }
+
+        [Route("/pks/testgpg")]
+        [HttpGet]
+        public IActionResult TestGpg()
+        {
+            using var context = new Libgpgme.Context();
+            var store = context.KeyStore;
+            
+            var keys = store.GetKeyList("*", false);
+            
+            Console.WriteLine("GPG keys:");
+            foreach (var key in keys)
+            {
+                Console.WriteLine($"{key.Fingerprint}");
+            }
+            
+            
+            return Ok();
         }
     }
 }

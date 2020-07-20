@@ -32,6 +32,12 @@ namespace Mautom.Portunus.Entities.Models
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public PublicKeyFingerprint Fingerprint { get; set; } = null!;
         
+        [Required(AllowEmptyStrings = false)]
+        public string LongKeyId { get; set; } = null!;
+
+        [Required(AllowEmptyStrings = false)]
+        public string ShortKeyId { get; set; } = null!;
+        
         [Required(AllowEmptyStrings = false, ErrorMessage = "No public key data!")]
         [DataType(DataType.Text)]
         public string ArmoredKey { get; set; } = null!;

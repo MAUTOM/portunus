@@ -49,18 +49,18 @@ namespace Mautom.Portunus.Repository
                 .SingleOrDefault();
         }
 
-        public PublicKey? GetPublicKeyByLongKeyId(string keyId, bool trackChanges = true)
+        public PublicKey? GetPublicKeyByKeyId(string keyId, bool trackChanges = true)
         {
+            if (keyId.Length == 40)
+                return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(keyId)), trackChanges)
+                    .Include(pk => pk.KeyIdentities)
+                    .SingleOrDefault();
+            
             return FindByCondition(
-                    key => key.Fingerprint.LongKeyId.Equals(keyId, StringComparison.InvariantCultureIgnoreCase),
+                    key => key.LongKeyId.Equals(keyId, StringComparison.InvariantCultureIgnoreCase) || key.ShortKeyId.Equals(keyId, StringComparison.InvariantCultureIgnoreCase),
                     trackChanges)
                 .Include(pk => pk.KeyIdentities)
                 .FirstOrDefault();
-        }
-
-        public PublicKey? GetPublicKeyByShortKeyId(string keyId, bool trackChanges = true)
-        {
-            throw new System.NotImplementedException();
         }
         
         public void CreatePublicKey(PublicKey key)
