@@ -30,6 +30,8 @@ namespace Mautom.Portunus.Shared.Pgp
         [StringValue("e")]
         Expired = 2,
         [StringValue("d")]
-        Disabled = 4
+        Disabled = 4,
+        [StringValue("v")]
+        Verified = 8
     }
 }

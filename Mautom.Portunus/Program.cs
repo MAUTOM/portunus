@@ -17,9 +17,13 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.IO;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Extensions;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -30,9 +34,43 @@ namespace Mautom.Portunus
     {
         public static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
-            //CreateDbIfNotExists(host);
-            host.MigrateDatabase();
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddEnvironmentVariables()
+                .AddJsonFile("certificates.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"certificates.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", false, true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true, true)
+                .Build();
+            
+            var certificateSettings = config.GetSection("certificateSettings");
+            string certificateFileName = certificateSettings.GetValue<string>("fileName");
+            string certificatePassword = certificateSettings.GetValue<string>("password");
+
+            Console.WriteLine($"Setting cert to: {certificateFileName}");
+            //Console.ReadLine();
+            
+            var certificate = new X509Certificate2(certificateFileName, certificatePassword);
+        
+            var host = new WebHostBuilder()
+                .UseKestrel(
+                    options =>
+                    {
+                        options.AddServerHeader = false;
+                        options.Listen(IPAddress.Loopback, 44321, listenOptions =>
+                        {
+                            listenOptions.UseHttps(certificate);
+                        });
+                        options.Listen(IPAddress.Loopback, 5000);
+                    }
+                )
+                .UseConfiguration(config)
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseStartup<Startup>()
+                .UseUrls("https://localhost:44321", "http://localhost:5000")
+                .Build();
+            
+            //host.MigrateDatabase();
             host.Run();
         }
 

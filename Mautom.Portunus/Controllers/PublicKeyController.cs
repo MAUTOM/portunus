@@ -89,7 +89,7 @@ namespace Mautom.Portunus.Controllers
 
             var createdKey = _mapper.Map<PublicKeyDto>(keyEntity);
 
-            return CreatedAtRoute("PublicKeyByFingerprint", new {Fingerprint = createdKey.Fingerprint}, createdKey);
+            return CreatedAtRoute("PublicKeyByFingerprint", new {createdKey.Fingerprint}, createdKey);
         }
     }
 }

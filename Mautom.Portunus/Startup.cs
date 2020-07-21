@@ -24,7 +24,9 @@ using Mautom.Portunus.Entities;
 using Mautom.Portunus.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -65,6 +67,24 @@ namespace Mautom.Portunus
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
             }).AddCustomHkpFormatter();
+            
+            services.AddMvc(
+                options =>
+                {
+                    options.SslPort = 44321;
+                    //options.Filters.Add(new RequireHttpsAttribute());
+                }
+            );
+
+            services.AddAntiforgery(
+                options =>
+                {
+                    options.Cookie.Name = "_af";
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.HeaderName = "X-XSRF-TOKEN";
+                }
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,10 +94,13 @@ namespace Mautom.Portunus
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseHsts();
+            else
+            {
+                app.UseHsts();
+                app.UseHttpsRedirection();
+            }
+            
             app.ConfigureExceptionHandler(logger);
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCors("CorsPolicy");
             app.UseForwardedHeaders(new ForwardedHeadersOptions

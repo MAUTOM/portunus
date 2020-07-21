@@ -15,9 +15,9 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 using Mautom.Portunus.Entities.Configuration;
 using Mautom.Portunus.Entities.Models;
-using Mautom.Portunus.Shared;
 using Mautom.Portunus.Shared.Pgp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -51,7 +51,7 @@ namespace Mautom.Portunus.Entities
                 .HasConversion(fpConverter);
             
             modelBuilder.Entity<PublicKey>()
-                .Property((k) => k.SubmissionDate)
+                .Property(k => k.SubmissionDate)
                 .HasDefaultValueSql("now()");
 
             modelBuilder.Entity<PublicKey>()
