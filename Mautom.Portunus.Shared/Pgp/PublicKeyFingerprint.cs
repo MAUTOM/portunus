@@ -78,7 +78,7 @@ namespace Mautom.Portunus.Shared.Pgp
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Fingerprint, other.Fingerprint, StringComparison.InvariantCultureIgnoreCase);
+            return string.Equals(Fingerprint, other.Fingerprint, StringComparison.OrdinalIgnoreCase);
         }
         
         public override bool Equals(object? obj)
@@ -88,7 +88,7 @@ namespace Mautom.Portunus.Shared.Pgp
 
         public override int GetHashCode()
         {
-            return StringComparer.InvariantCultureIgnoreCase.GetHashCode(Fingerprint);
+            return StringComparer.OrdinalIgnoreCase.GetHashCode(Fingerprint);
         }
 
         public static bool operator ==(PublicKeyFingerprint? left, PublicKeyFingerprint? right)

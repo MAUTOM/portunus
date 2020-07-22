@@ -28,11 +28,11 @@ namespace Mautom.Portunus.Repository
                                              || (id.Comment != null && id.Comment.Contains(searchPattern)), false)
                 .OrderBy(id => id.Name)
                 .Include(id => id.PublicKey);
-            return FindByCondition(id => id.Name.Equals(searchPattern, StringComparison.InvariantCultureIgnoreCase)
+            return FindByCondition(id => id.Name.Equals(searchPattern, StringComparison.OrdinalIgnoreCase)
                                          || id.Email.Equals(searchPattern,
-                                             StringComparison.InvariantCultureIgnoreCase)
+                                             StringComparison.OrdinalIgnoreCase)
                                          || (id.Comment != null && id.Comment.Equals(searchPattern,
-                                             StringComparison.InvariantCultureIgnoreCase)), trackChanges)
+                                             StringComparison.OrdinalIgnoreCase)), trackChanges)
                 .OrderBy(id => id.Name)
                 .Include(id => id.PublicKey);
         }
@@ -41,7 +41,7 @@ namespace Mautom.Portunus.Repository
             FindByCondition(
                     identity =>
                         identity.PublicKeyFingerprint.Equals(fingerprint) &&
-                        identity.Email.Equals(email, StringComparison.InvariantCultureIgnoreCase), trackChanges)
+                        identity.Email.Equals(email, StringComparison.OrdinalIgnoreCase), trackChanges)
                 .SingleOrDefault();
 
         public void CreateKeyIdentity(KeyIdentity key)

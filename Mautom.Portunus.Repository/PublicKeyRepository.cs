@@ -57,7 +57,7 @@ namespace Mautom.Portunus.Repository
                     .SingleOrDefault();
             
             return FindByCondition(
-                    key => key.LongKeyId.Equals(keyId, StringComparison.InvariantCultureIgnoreCase) || key.ShortKeyId.Equals(keyId, StringComparison.InvariantCultureIgnoreCase),
+                    key => key.LongKeyId.Equals(keyId, StringComparison.OrdinalIgnoreCase) || key.ShortKeyId.Equals(keyId, StringComparison.OrdinalIgnoreCase),
                     trackChanges)
                 .Include(pk => pk.KeyIdentities)
                 .FirstOrDefault();
