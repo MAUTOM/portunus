@@ -9,11 +9,11 @@ namespace Mautom.Portunus.Shared.Pgp
         
         public string Fingerprint
         {
-            get => _fingerprint.ToUpperInvariant();
+            get => _fingerprint.ToUpper();
             private set
             {
                 ValidateFingerprint(value);
-                _fingerprint = value.ToUpperInvariant();
+                _fingerprint = value.ToUpper();
             }
         }
 
@@ -58,20 +58,15 @@ namespace Mautom.Portunus.Shared.Pgp
         {
             if (string.IsNullOrEmpty(format)) format = "G";
 
-            switch (format)
+            return format switch
             {
-                case "G":
-                    return Fingerprint;
-                case "FP":
-                    return
-                        string.Format("{0} {1} {2} {3} {4} {5} {6}", Fingerprint.Substring(0, 4),
-                            Fingerprint.Substring(4, 4), Fingerprint.Substring(8, 4), Fingerprint.Substring(16, 4),
-                            Fingerprint.Substring(24, 4), Fingerprint.Substring(32, 4), Fingerprint.Substring(36, 4));
-                case "X":
-                    return $"0x{Fingerprint}";
-                default:
-                    throw new FormatException($"The {format} string is not implemented. Use \"G\" or \"FP\" ");
-            }
+                "G" => Fingerprint,
+                "FP" => string.Format("{0} {1} {2} {3} {4} {5} {6}", Fingerprint.Substring(0, 4),
+                    Fingerprint.Substring(4, 4), Fingerprint.Substring(8, 4), Fingerprint.Substring(16, 4),
+                    Fingerprint.Substring(24, 4), Fingerprint.Substring(32, 4), Fingerprint.Substring(36, 4)),
+                "X" => $"0x{Fingerprint}",
+                _ => throw new FormatException($"The {format} string is not implemented. Use \"G\" or \"FP\" ")
+            };
         }
 
         public bool Equals(PublicKeyFingerprint? other)

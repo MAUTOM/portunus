@@ -20,6 +20,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using Mautom.Portunus.Config;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Extensions;
 using Microsoft.AspNetCore.Hosting;
@@ -34,14 +35,7 @@ namespace Mautom.Portunus
     {
         public static void Main(string[] args)
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddEnvironmentVariables()
-                .AddJsonFile("certificates.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"certificates.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true)
-                .AddJsonFile("appsettings.json", false, true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true, true)
-                .Build();
+            var config = ConfigManager.Configuration;
             
             var certificateSettings = config.GetSection("certificateSettings");
             string certificateFileName = certificateSettings.GetValue<string>("fileName");

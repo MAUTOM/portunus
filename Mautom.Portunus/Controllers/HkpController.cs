@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using MoreLinq.Extensions;
+using NLog;
 
 namespace Mautom.Portunus.Controllers
 {
@@ -22,13 +23,12 @@ namespace Mautom.Portunus.Controllers
     [ApiController]
     public class HkpController : ControllerBase
     {
-        private readonly ILoggerManager _logger;
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger(); 
         private readonly IRepositoryManager _repository;
         private readonly IMapper _mapper;
 
-        public HkpController(ILoggerManager logger, IRepositoryManager manager, IMapper mapper)
+        public HkpController(IRepositoryManager manager, IMapper mapper)
         {
-            _logger = logger;
             _repository = manager;
             _mapper = mapper;
         }
@@ -39,14 +39,14 @@ namespace Mautom.Portunus.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status501NotImplemented)]
         public IActionResult Lookup([FromQuery] string op, [FromQuery] string search,
-            [FromQuery] string? options = "mr",
-            [FromQuery] bool? exact = false)
+            [FromQuery] string? options,
+            [FromQuery] bool? exact)
         {
-            _logger.LogDebug(
+            _logger.Debug(
                 $"[REQUEST: /pks/lookup/]: {{op={op}, search={search}, options={options}, exact={exact}}}");
 
-            op = op.ToLowerInvariant();
-            options ??= string.Empty;
+            op = op.ToLower();
+            options ??= "mr";
             exact ??= false;
 
 
@@ -57,7 +57,7 @@ namespace Mautom.Portunus.Controllers
                     {
                         search = search.Trim('\n', '\r');
                         search = search.Remove(0, 2);
-                        _logger.LogInfo($"Searching for {search}");
+                        _logger.Info($"Searching for {search}");
 
                         if (search.Length != 40 && search.Length != 16 && search.Length != 8)
                             return BadRequest();
@@ -117,7 +117,7 @@ namespace Mautom.Portunus.Controllers
                     {
                         search = search.Trim('\n', '\r');
                         search = search.Remove(0, 2);
-                        _logger.LogInfo($"Searching for {search}");
+                        _logger.Info($"Searching for {search}");
 
                         if (search.Length != 40 && search.Length != 16 && search.Length != 8)
                             return StatusCode(501, "Not Implemented");
@@ -180,7 +180,7 @@ namespace Mautom.Portunus.Controllers
             if (string.IsNullOrEmpty(keytext))
                 return BadRequest();
 
-            _logger.LogInfo("Received HKP key submission");
+            _logger.Info("Received HKP key submission");
             using var gpgContext = new Context {KeylistMode = KeylistMode.Signatures, Armor = true};
 
             var store = gpgContext.KeyStore;
@@ -196,7 +196,7 @@ namespace Mautom.Portunus.Controllers
             {
                 var key = (PgpKey) store.GetKey(importResult.Fpr, false);
 
-                _logger.LogInfo(
+                _logger.Info(
                     $"Imported fpr:{key.Fingerprint}, created at: {key.Uid.Signatures.Timestamp}, identities: {key.Uids.Count()}");
 
                 var data = new GpgmeMemoryData {Encoding = DataEncoding.Armor};
@@ -247,7 +247,8 @@ namespace Mautom.Portunus.Controllers
 
             return Ok();
         }
-
+        
+#if DEBUG
         [Route("/pks/testgpg")]
         [HttpGet]
         public IActionResult TestGpg()
@@ -265,5 +266,6 @@ namespace Mautom.Portunus.Controllers
 
             return Ok();
         }
+#endif        
     }
 }
