@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace Mautom.Portunus.Shared.Pgp
 {
@@ -44,9 +45,13 @@ namespace Mautom.Portunus.Shared.Pgp
             if(fingerprint.Length != 40) throw new PgpException("The public key fingerprint must be 160 bits long (v4).");
         }
 
-        private void ValidateFingerprint()
+        public static bool IsValidFingerprint(string fingerprint)
         {
-            if(_fingerprint.Length != 40) throw new PgpException("The public key fingerprint must be 160 bits long (v4).");
+            if (fingerprint.Length != 40) return false;
+            
+            var isAscii = fingerprint.All(c => c <= 127);
+
+            return isAscii;
         }
 
         public override string ToString()

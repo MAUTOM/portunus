@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using NLog;
+using NLog.Fluent;
 
 namespace Mautom.Portunus.Config
 {
@@ -24,7 +25,12 @@ namespace Mautom.Portunus.Config
 
             
             Logger.Info("Initialized configuration root");
-            Logger.Debug($"Configuration providers: {Configuration.Providers.ToList()}");
+
+            foreach (var cfg in Configuration.Providers)
+            {
+                Logger.Debug($"Loaded: {cfg}");
+            }
+            
         }
     }
 }

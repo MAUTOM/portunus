@@ -20,14 +20,15 @@ namespace Mautom.Portunus.Repository
                     id.PublicKeyFingerprint.Equals(fingerprint), trackChanges)
                 .OrderBy(id => id.IdentityId);
 
-        public IEnumerable<KeyIdentity> SearchIdentities(string searchPattern, bool exact = false, bool trackChanges = true)
+        public IEnumerable<KeyIdentity> SearchIdentities(string searchPattern, bool exact = false,
+            bool trackChanges = true)
         {
-            if(!exact)
-                return FindByCondition(id => id.Name.Contains(searchPattern) 
-                                             || id.Email.Contains(searchPattern) 
+            if (!exact)
+                return FindByCondition(id => id.Name.Contains(searchPattern)
+                                             || id.Email.Contains(searchPattern)
                                              || (id.Comment != null && id.Comment.Contains(searchPattern)), false)
-                .OrderBy(id => id.Name)
-                .Include(id => id.PublicKey);
+                    .OrderBy(id => id.Name)
+                    .Include(id => id.PublicKey);
             return FindByCondition(id => id.Name.Equals(searchPattern, StringComparison.OrdinalIgnoreCase)
                                          || id.Email.Equals(searchPattern,
                                              StringComparison.OrdinalIgnoreCase)
@@ -42,7 +43,13 @@ namespace Mautom.Portunus.Repository
                     identity =>
                         identity.PublicKeyFingerprint.Equals(fingerprint) &&
                         identity.Email.Equals(email, StringComparison.OrdinalIgnoreCase), trackChanges)
+                .Include(id => id.PublicKey)
                 .SingleOrDefault();
+
+        public KeyIdentity? GetIdentityByEmail(string email, bool trackChanges = true) => FindByCondition(
+                identity => identity.Email.Equals(email, StringComparison.OrdinalIgnoreCase), trackChanges)
+            .Include(id => id.PublicKey)
+            .SingleOrDefault();
 
         public void CreateKeyIdentity(KeyIdentity key)
         {
