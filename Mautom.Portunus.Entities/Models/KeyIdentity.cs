@@ -47,6 +47,13 @@ namespace Mautom.Portunus.Entities.Models
         [Required(ErrorMessage = "User ID creation date must be specified.")]
         public DateTime CreationDate { get; set; }
         
+        [Required]
+        public IdentityStatus Status { get; set; }
+        
+        public Guid? VerificationToken { get; set; }
+        public ushort? VerificationSecret { get; set; }
+        
+        
         [Column(TypeName = "varchar(40)")]
         public PublicKeyFingerprint PublicKeyFingerprint { get; set; } = null!;
         

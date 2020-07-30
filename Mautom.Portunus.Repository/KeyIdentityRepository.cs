@@ -51,9 +51,9 @@ namespace Mautom.Portunus.Repository
             .Include(id => id.PublicKey)
             .SingleOrDefault();
 
-        public void CreateKeyIdentity(KeyIdentity key)
+        public void CreateKeyIdentity(KeyIdentity identity)
         {
-            throw new NotImplementedException();
+            Create(identity);
         }
 
         public KeyIdentityRepository(RepositoryContext repositoryContext) : base(repositoryContext)

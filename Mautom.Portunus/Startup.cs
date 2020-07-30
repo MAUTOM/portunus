@@ -30,6 +30,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using NLog;
 
 namespace Mautom.Portunus
@@ -74,7 +77,11 @@ namespace Mautom.Portunus
                     options.SslPort = 44321;
                     //options.Filters.Add(new RequireHttpsAttribute());
                 }
-            );
+            ).AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.Formatting = Formatting.Indented;
+                options.SerializerSettings.Converters.Add(new StringEnumConverter(new SnakeCaseNamingStrategy()));
+            });
 
             services.AddAntiforgery(
                 options =>

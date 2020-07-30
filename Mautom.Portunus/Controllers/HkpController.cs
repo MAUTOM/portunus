@@ -195,7 +195,13 @@ namespace Mautom.Portunus.Controllers
             foreach (var importResult in result.Imports)
             {
                 var key = (PgpKey) store.GetKey(importResult.Fpr, false);
-
+                
+                if (_repository.PublicKey.GetPublicKeyByFingerprint(importResult.Fpr, false) != null)
+                {
+                    _logger.Warn($"Submission of already existing Fpr: {key.Fingerprint}. Skipping.");
+                    continue;
+                }
+                
                 _logger.Info(
                     $"Imported fpr:{key.Fingerprint}, created at: {key.Uid.Signatures.Timestamp}, identities: {key.Uids.Count()}");
 

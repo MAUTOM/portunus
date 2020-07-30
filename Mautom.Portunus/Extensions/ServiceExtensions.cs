@@ -56,7 +56,7 @@ namespace Mautom.Portunus.Extensions
 
         public static void ConfigureMySqlContext(this IServiceCollection services, IConfiguration config)
         {
-            var connectionString = config["ConnectionStrings:KeyDatabase"];
+            var connectionString = config["ConnectionStrings:KeyDatabase"] ?? "Server=/var/run/mysqld/mysqld.sock;Database=dev_keyserver;User=makeys;Password=makeys20;";
             services.AddDbContext<RepositoryContext>(o => o.UseMySql(connectionString, options => options.MigrationsAssembly("Mautom.Portunus.Entities")));
         }
         
