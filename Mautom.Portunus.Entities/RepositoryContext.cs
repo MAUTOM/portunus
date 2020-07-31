@@ -16,6 +16,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using Mautom.Portunus.Entities.Configuration;
 using Mautom.Portunus.Entities.Models;
 using Mautom.Portunus.Shared.Pgp;
@@ -57,10 +58,15 @@ namespace Mautom.Portunus.Entities
             modelBuilder.Entity<PublicKey>()
                 .Property(k => k.Flags)
                 .HasDefaultValue(PublicKeyFlags.None);
-            
-            
 
+            modelBuilder.Entity<AddressVerification>()
+                .Property(av => av.Token)
+                .HasDefaultValue(Guid.NewGuid());
 
+            modelBuilder.Entity<AddressVerification>()
+                .HasIndex(av => av.Email)
+                .IsUnique();
+            
             // seed
             modelBuilder.ApplyConfiguration(new PublicKeyConfiguration());
             modelBuilder.ApplyConfiguration(new KeyIdentityConfiguration());

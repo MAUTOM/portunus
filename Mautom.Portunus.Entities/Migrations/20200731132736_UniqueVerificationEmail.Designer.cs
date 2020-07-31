@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Mautom.Portunus.Entities.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20200730124127_AddIdentityStatus")]
-    partial class AddIdentityStatus
+    [Migration("20200731132736_UniqueVerificationEmail")]
+    partial class UniqueVerificationEmail
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -18,6 +18,38 @@ namespace Mautom.Portunus.Entities.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("Mautom.Portunus.Entities.Models.AddressVerification", b =>
+                {
+                    b.Property<int>("VerificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("verification_id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnName("email")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
+                    b.Property<Guid>("Token")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("token")
+                        .HasColumnType("char(36)")
+                        .HasDefaultValue(new Guid("068f637c-d109-4b76-a767-e335f90da156"));
+
+                    b.Property<ushort>("VerificationCode")
+                        .HasColumnName("verification_code")
+                        .HasColumnType("smallint unsigned");
+
+                    b.HasKey("VerificationId")
+                        .HasName("pk_address_verification");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasName("ix_address_verification_email");
+
+                    b.ToTable("address_verification");
+                });
 
             modelBuilder.Entity("Mautom.Portunus.Entities.Models.KeyIdentity", b =>
                 {
@@ -55,7 +87,7 @@ namespace Mautom.Portunus.Entities.Migrations
                         .HasColumnName("status")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("VerificationToken")
+                    b.Property<Guid>("VerificationToken")
                         .HasColumnName("verification_token")
                         .HasColumnType("char(36)");
 
@@ -75,7 +107,8 @@ namespace Mautom.Portunus.Entities.Migrations
                             Email = "horvath.bence@muszerautomatika.hu",
                             Name = "Bence Horváth",
                             PublicKeyFingerprint = "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0",
-                            Status = 0
+                            Status = 0,
+                            VerificationToken = new Guid("00000000-0000-0000-0000-000000000000")
                         },
                         new
                         {
@@ -84,7 +117,8 @@ namespace Mautom.Portunus.Entities.Migrations
                             Email = "horvath.gabor@muszerautomatika.hu",
                             Name = "Gábor Horváth",
                             PublicKeyFingerprint = "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360",
-                            Status = 0
+                            Status = 0,
+                            VerificationToken = new Guid("00000000-0000-0000-0000-000000000000")
                         });
                 });
 

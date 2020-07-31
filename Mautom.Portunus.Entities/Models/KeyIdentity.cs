@@ -50,9 +50,7 @@ namespace Mautom.Portunus.Entities.Models
         [Required]
         public IdentityStatus Status { get; set; }
         
-        public Guid? VerificationToken { get; set; }
-        public ushort? VerificationSecret { get; set; }
-        
+        public Guid VerificationToken { get; set; }
         
         [Column(TypeName = "varchar(40)")]
         public PublicKeyFingerprint PublicKeyFingerprint { get; set; } = null!;

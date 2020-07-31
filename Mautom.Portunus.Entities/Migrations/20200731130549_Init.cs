@@ -9,6 +9,21 @@ namespace Mautom.Portunus.Entities.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "address_verification",
+                columns: table => new
+                {
+                    verification_id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    token = table.Column<Guid>(nullable: false, defaultValue: new Guid("399edbb9-695a-4336-a538-70e9437102da")),
+                    email = table.Column<string>(nullable: false),
+                    verification_code = table.Column<ushort>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_address_verification", x => x.verification_id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "public_keys",
                 columns: table => new
                 {
@@ -38,6 +53,8 @@ namespace Mautom.Portunus.Entities.Migrations
                     email = table.Column<string>(nullable: false),
                     comment = table.Column<string>(maxLength: 200, nullable: true),
                     creation_date = table.Column<DateTime>(nullable: false),
+                    status = table.Column<int>(nullable: false),
+                    verification_token = table.Column<Guid>(nullable: false),
                     public_key_fingerprint = table.Column<string>(type: "varchar(40)", nullable: false)
                 },
                 constraints: table =>
@@ -348,13 +365,13 @@ IMNgaG75uJaVS3Z787pEWteuiKyRb/H/JQ==
 
             migrationBuilder.InsertData(
                 table: "key_identities",
-                columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint" },
-                values: new object[] { -1L, string.Empty, new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.bence@muszerautomatika.hu", "Bence Horváth", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0" });
+                columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint", "status", "verification_token" },
+                values: new object[] { -1L, string.Empty, new DateTime(2020, 6, 18, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.bence@muszerautomatika.hu", "Bence Horváth", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0", 0, new Guid("00000000-0000-0000-0000-000000000000") });
 
             migrationBuilder.InsertData(
                 table: "key_identities",
-                columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint" },
-                values: new object[] { -2L, string.Empty, new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.gabor@muszerautomatika.hu", "Gábor Horváth", "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360" });
+                columns: new[] { "identity_id", "comment", "creation_date", "email", "name", "public_key_fingerprint", "status", "verification_token" },
+                values: new object[] { -2L, string.Empty, new DateTime(2020, 6, 22, 0, 0, 0, 0, DateTimeKind.Unspecified), "horvath.gabor@muszerautomatika.hu", "Gábor Horváth", "1FDA0F756C0A2A78775CBC7BFA0060473ACD2360", 0, new Guid("00000000-0000-0000-0000-000000000000") });
 
             migrationBuilder.CreateIndex(
                 name: "ix_key_identities_public_key_fingerprint",
@@ -364,6 +381,9 @@ IMNgaG75uJaVS3Z787pEWteuiKyRb/H/JQ==
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "address_verification");
+
             migrationBuilder.DropTable(
                 name: "key_identities");
 

@@ -13,6 +13,7 @@ using Mautom.Portunus.Shared.Pgp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 using NLog;
 
 namespace Mautom.Portunus.Controllers
@@ -212,9 +213,43 @@ namespace Mautom.Portunus.Controllers
 
                 //Console.WriteLine($"Read gpg data: {data.Length}\nArmor: {armor}");
             }
-
             
+            return Ok();
+        }
 
+        [HttpPost("request-verify")]
+        public IActionResult RequestVerify(RequestVerifyParameters vp)
+        {
+            Log.Info(JsonConvert.SerializeObject(vp));
+
+            var identities = _repository.KeyIdentity.GetIdentitiesByToken(vp.Token).ToList();
+
+            if (identities.Count == 0)
+                return NotFound();
+
+            if (vp.Addresses.Any(address => !identities.Any(id => id.Email.Equals(address, StringComparison.OrdinalIgnoreCase))))
+            {
+                return BadRequest("One of the specified addresses does not exist.");
+            }
+            
+            // all specified addresses can be verified.
+            
+            var rnd = new Random();
+
+            foreach (var address in vp.Addresses)
+            {
+                var verification = new AddressVerification
+                {
+                    Token = vp.Token,
+                    Email = address,
+                    VerificationCode = (ushort) rnd.Next(10000, ushort.MaxValue)
+                };
+                
+                _repository.AddressVerification.Create(verification);
+            }
+            
+            _repository.Save();
+            
             return Ok();
         }
        

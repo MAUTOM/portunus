@@ -26,6 +26,7 @@ namespace Mautom.Portunus.Repository
         private readonly RepositoryContext _repoContext;
         private IPublicKeyRepository _publicKeyRepository = null!;
         private IKeyIdentityRepository _keyIdentityRepository = null!;
+        private IAddressVerificationRepository _addressVerificationRepository = null!;
         
         public RepositoryManager(RepositoryContext context)
         {
@@ -33,11 +34,13 @@ namespace Mautom.Portunus.Repository
         }
         
 #if DEBUG
+        
         public RepositoryContext Context => _repoContext;
 #endif
 
         public IPublicKeyRepository PublicKey => _publicKeyRepository ??= new PublicKeyRepository(_repoContext);
         public IKeyIdentityRepository KeyIdentity => _keyIdentityRepository ??= new KeyIdentityRepository(_repoContext);
+        public IAddressVerificationRepository AddressVerification => _addressVerificationRepository ??= new AddressVerificationRepository(_repoContext);
 
         public void Save() => _repoContext.SaveChanges();
     }

@@ -24,6 +24,7 @@ namespace Mautom.Portunus.Contracts
     {
         IPublicKeyRepository PublicKey { get; }
         IKeyIdentityRepository KeyIdentity { get; }
+        IAddressVerificationRepository AddressVerification { get; }
         
 #if DEBUG
         RepositoryContext Context { get; }

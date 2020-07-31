@@ -38,6 +38,13 @@ namespace Mautom.Portunus.Repository
                 .Include(id => id.PublicKey);
         }
 
+        public IEnumerable<KeyIdentity> GetIdentitiesByToken(Guid token, bool trackChanges = true)
+        {
+            return FindByCondition(id => id.VerificationToken.Equals(token), trackChanges)
+                .OrderBy(id => id.IdentityId)
+                .Include(id => id.PublicKey);
+        }
+
         public KeyIdentity? GetIdentityByEmail(string fingerprint, string email, bool trackChanges = true) =>
             FindByCondition(
                     identity =>
