@@ -59,6 +59,11 @@ namespace Mautom.Portunus.Shared.Pgp
             return ToString("G", CultureInfo.InvariantCulture);
         }
 
+        public string ToString(string format)
+        {
+            return ToString(format, CultureInfo.InvariantCulture);
+        }
+
         public string ToString(string? format, IFormatProvider? formatProvider)
         {
             if (string.IsNullOrEmpty(format)) format = "G";

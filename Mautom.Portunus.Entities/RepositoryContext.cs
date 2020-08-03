@@ -29,6 +29,7 @@ namespace Mautom.Portunus.Entities
     {
         public DbSet<PublicKey> PublicKeys { get; set; } = null!;
         public DbSet<KeyIdentity> KeyIdentities { get; set; } = null!;
+        public DbSet<AddressVerification> AddressVerifications { get; set; } = null!;
         
         public RepositoryContext(DbContextOptions<RepositoryContext> options) : base(options)
         {

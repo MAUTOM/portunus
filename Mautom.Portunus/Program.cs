@@ -21,8 +21,10 @@ using System.IO;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using Mautom.Portunus.Config;
+using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Extensions;
+using Mautom.Portunus.Gpg;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,6 +47,10 @@ namespace Mautom.Portunus
             //Console.ReadLine();
             
             var certificate = new X509Certificate2(certificateFileName, certificatePassword);
+            
+            GpgKeychain.Instance.Purge();
+
+            AppDomain.CurrentDomain.ProcessExit += (o, e) => GpgKeychain.Instance.Dispose();
         
             var host = new WebHostBuilder()
                 .UseKestrel(
@@ -65,7 +71,13 @@ namespace Mautom.Portunus
                 .Build();
             
             //host.MigrateDatabase();
+            using var scope = host.Services.CreateScope();
+            var repoManager = scope.ServiceProvider.GetRequiredService<IRepositoryManager>();
+            
+            GpgKeychain.Instance.ImportAllKeys(repoManager.PublicKey);
+            
             host.Run();
+            
         }
 
         private static void CreateDbIfNotExists(IHost host)

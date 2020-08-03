@@ -56,6 +56,7 @@ namespace Mautom.Portunus
             services.ConfigureLoggerService();
             services.ConfigureMySqlContext(Configuration);
             services.ConfigureRepositoryManager();
+            
 
             services.AddAutoMapper(typeof(Startup));
             services.AddAutoMapper((sp, automapper) =>
@@ -92,6 +93,8 @@ namespace Mautom.Portunus
                     options.HeaderName = "X-XSRF-TOKEN";
                 }
             );
+            
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -116,7 +119,7 @@ namespace Mautom.Portunus
             });
 
             app.UseRouting();
-
+            
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

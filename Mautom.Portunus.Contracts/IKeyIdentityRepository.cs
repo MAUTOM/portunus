@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Mautom.Portunus.Entities.Models;
+using Mautom.Portunus.Shared.Pgp;
 
 namespace Mautom.Portunus.Contracts
 {
@@ -12,6 +13,7 @@ namespace Mautom.Portunus.Contracts
         IEnumerable<KeyIdentity> GetIdentitiesByToken(Guid token, bool trackChanges = true);
         KeyIdentity? GetIdentityByEmail(string fingerprint, string email, bool trackChanges = true);
         KeyIdentity? GetIdentityByEmail(string email, bool trackChanges = true);
+        PublicKeyFingerprint GetFingerprintByToken(Guid token, bool trackChanges = false);
         void CreateKeyIdentity(KeyIdentity key);
     }
 }

@@ -9,6 +9,7 @@ using Libgpgme;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities.DataTransferObjects;
 using Mautom.Portunus.Entities.Models;
+using Mautom.Portunus.Gpg;
 using Mautom.Portunus.Shared.Pgp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -136,19 +137,12 @@ namespace Mautom.Portunus.Controllers
                 return BadRequest();
             
             //Log.Debug($"Got keytext: {up.KeyText}");
-            using var gpgContext = new Context {KeylistMode = KeylistMode.Signatures, Armor = true};
-            var store = gpgContext.KeyStore;
-            var encoder = new UTF8Encoding();
-            var keyData = encoder.GetBytes(up.KeyText);
 
-            var mStream = new MemoryStream(keyData);
-            var gpgStream = new GpgmeStreamData(mStream);
-
-            var result = store.Import(gpgStream);
+            var result = GpgKeychain.Instance.ImportArmoredKey(up.KeyText);
 
             foreach (var importResult in result.Imports)
             {
-                var key = (PgpKey) store.GetKey(importResult.Fpr, false);
+                var key = (PgpKey) GpgKeychain.Instance.KeyStore.GetKey(importResult.Fpr, false);
 
                 if (_repository.PublicKey.GetPublicKeyByFingerprint(importResult.Fpr, false) != null)
                 {
@@ -159,12 +153,8 @@ namespace Mautom.Portunus.Controllers
                 Log.Info(
                     $"Imported fpr:{key.Fingerprint}, created at: {key.Uid.Signatures.Timestamp}, identities: {key.Uids.Count()}");
 
-                var data = new GpgmeMemoryData {Encoding = DataEncoding.Armor};
-                store.Export(key.Fingerprint, data);
-                data.Position = 0;
 
-                using var reader = new StreamReader(data, Encoding.ASCII);
-                var armor = reader.ReadToEnd();
+                var armor = GpgKeychain.Instance.ExportArmoredKey(key.Fingerprint);
 
                 // create new db record
 
@@ -202,8 +192,10 @@ namespace Mautom.Portunus.Controllers
                 _repository.PublicKey.CreatePublicKey(publicKey);
                 _repository.Save();
                 
-                store.DeleteKey(key, false);
-
+#if DEBUG                
+                GpgKeychain.Instance.KeyStore.DeleteKey(key, false); 
+#endif
+                
                 key.Dispose();
                 
                 // produce response
@@ -231,27 +223,76 @@ namespace Mautom.Portunus.Controllers
             {
                 return BadRequest("One of the specified addresses does not exist.");
             }
-            
+
+            var affectedIdentities = identities.Where(id => vp.Addresses.Contains(id.Email) && id.Status == IdentityStatus.Unpublished).ToList();
+
             // all specified addresses can be verified.
             
             var rnd = new Random();
-
-            foreach (var address in vp.Addresses)
+            var statusList = new Dictionary<string, IdentityStatus>();
+            foreach (var identity in affectedIdentities)
             {
                 var verification = new AddressVerification
                 {
                     Token = vp.Token,
-                    Email = address,
+                    Email = identity.Email,
                     VerificationCode = (ushort) rnd.Next(10000, ushort.MaxValue)
                 };
                 
                 _repository.AddressVerification.Create(verification);
+                statusList.Add(identity.Email, IdentityStatus.Pending);
+                identity.Status = IdentityStatus.Pending;
+                _repository.KeyIdentity.Update(identity);
+                // TODO: send mail
+                
+                
+            }
+            
+            
+            _repository.Save();
+
+            var response = new KeyUploadResult(identities[0].PublicKeyFingerprint, vp.Token, statusList);
+            
+            return Ok(response);
+        }
+        
+        [HttpGet("verify/{token}")]
+        public IActionResult Verify(Guid token, [FromQuery] ushort secret)
+        {
+            if (secret < 10000)
+                return BadRequest();
+            
+            Log.Debug($"Verify request for token {token}, secret: {secret}.");
+
+            var verifications = _repository.AddressVerification.GetAddressVerificationsByToken(token).ToList();
+
+            foreach (var verification in verifications)
+            {
+                if (verification.VerificationCode != secret) continue;
+                var identity = _repository.KeyIdentity.GetIdentityByEmail(verification.Email);
+                    
+                if (identity == null)
+                {
+                    Log.Error("No matching identity found for address verification.");
+                    return StatusCode(500, "Internal Server Error");
+                }
+                    
+                identity.Status = IdentityStatus.Published;
+                _repository.KeyIdentity.Update(identity);
+
+                identity.PublicKey.Flags |= PublicKeyFlags.Verified;
+                _repository.PublicKey.Update(identity.PublicKey);
+                    
+                _repository.AddressVerification.Remove(verification);
+
+                Log.Info($"Verified address: {identity.Email}");
             }
             
             _repository.Save();
             
             return Ok();
         }
-       
+        
+
     }
 }

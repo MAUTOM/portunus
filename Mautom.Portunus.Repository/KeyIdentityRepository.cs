@@ -4,6 +4,7 @@ using System.Linq;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Entities.Models;
+using Mautom.Portunus.Shared.Pgp;
 using Microsoft.EntityFrameworkCore;
 
 namespace Mautom.Portunus.Repository
@@ -57,6 +58,12 @@ namespace Mautom.Portunus.Repository
                 identity => identity.Email.Equals(email, StringComparison.OrdinalIgnoreCase), trackChanges)
             .Include(id => id.PublicKey)
             .SingleOrDefault();
+
+        public PublicKeyFingerprint GetFingerprintByToken(Guid token, bool trackChanges = false)
+        {
+            return FindByCondition(identity => identity.VerificationToken.Equals(token), trackChanges).FirstOrDefault()
+                .PublicKeyFingerprint;
+        }
 
         public void CreateKeyIdentity(KeyIdentity identity)
         {
