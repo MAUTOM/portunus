@@ -18,13 +18,17 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using Mautom.Portunus.Config;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Extensions;
 using Mautom.Portunus.Gpg;
+using Mautom.Portunus.Mail;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +43,54 @@ namespace Mautom.Portunus
         {
             var config = ConfigManager.Configuration;
             
+            #region Signing key password storage
+            if (args.Contains("--with-root-password"))
+            {
+                Console.WriteLine("WARNING! It is recommended that the signing key password be provided by an EXTERNAL source (such as via pinentry).");
+                Console.WriteLine("Entering PGP root key password setting mode.");
+                
+                var secure = new SecureString();
+                var secure2 = new SecureString();
+                ConsoleKeyInfo key;
+                
+                Console.Write("Enter PGP root key password: ");
+                do
+                {
+                    key = Console.ReadKey(true);
+                    if ((int) key.Key < 65 || (int) key.Key > 90) continue;
+                    // Append the character to the password.
+                    secure.AppendChar(key.KeyChar);
+                    Console.Write("*");
+                } while (key.Key != ConsoleKey.Enter);
+                Console.WriteLine();
+                Console.Write("Repeat password: ");
+                do
+                {
+                    key = Console.ReadKey(true);
+                    if ((int) key.Key < 65 || (int) key.Key > 90) continue;
+                    // Append the character to the password.
+                    secure2.AppendChar(key.KeyChar);
+                    Console.Write("*");
+                } while (key.Key != ConsoleKey.Enter);
+                Console.WriteLine();
+                
+                if (!secure.Equals(secure2))
+                {
+                    Console.WriteLine("Passwords do not match!");
+                    Environment.Exit(-1);
+                }
+
+                ConfigManager.RootPassword = secure;
+                ConfigManager.RootPassword.MakeReadOnly();
+                secure.Dispose();
+                secure2.Dispose();
+                
+                Console.WriteLine("Signing key password set, continuing startup...");
+                Thread.Sleep(1500);
+            }
+            
+            #endregion            
+            
             var certificateSettings = config.GetSection("certificateSettings");
             string certificateFileName = certificateSettings.GetValue<string>("fileName");
             string certificatePassword = certificateSettings.GetValue<string>("password");
@@ -47,17 +99,26 @@ namespace Mautom.Portunus
             //Console.ReadLine();
             
             var certificate = new X509Certificate2(certificateFileName, certificatePassword);
-            
-            GpgKeychain.Instance.Purge();
 
-            AppDomain.CurrentDomain.ProcessExit += (o, e) => GpgKeychain.Instance.Dispose();
+            if (ConfigManager.PgpSettings.GetValue<bool>("ConfirmPurge"))
+            {
+                Console.WriteLine("Purging " + GpgKeychain.Instance.HomeDir);
+                Console.WriteLine("CONFIRM WITH ENTER");
+                Console.ReadLine();
+            }
+
+            GpgKeychain.Instance.Purge();
+            
+            AppDomain.CurrentDomain.ProcessExit += ExitLogic;
+            Console.CancelKeyPress += ExitLogic;
         
             var host = new WebHostBuilder()
                 .UseKestrel(
                     options =>
                     {
                         options.AddServerHeader = false;
-                        options.Listen(IPAddress.Loopback, 44321, listenOptions =>
+                        options.Listen(IPAddress.Parse(ConfigManager.ApiSettings.GetValue("Host", "localhost")),
+                            ConfigManager.ApiSettings.GetValue<int>("Port"), listenOptions =>
                         {
                             listenOptions.UseHttps(certificate);
                         });
@@ -67,17 +128,27 @@ namespace Mautom.Portunus
                 .UseConfiguration(config)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
-                .UseUrls("https://localhost:44321", "http://localhost:5000")
+                .UseUrls($"https://{ConfigManager.ApiSettings.GetValue<string>("Host")}:{ConfigManager.ApiSettings.GetValue<int>("Port")}", "http://localhost:5000")
                 .Build();
             
             //host.MigrateDatabase();
             using var scope = host.Services.CreateScope();
             var repoManager = scope.ServiceProvider.GetRequiredService<IRepositoryManager>();
             
-            GpgKeychain.Instance.ImportAllKeys(repoManager.PublicKey);
+            if(ConfigManager.PgpSettings.GetValue<bool>("LoadFromDatabase"))
+                GpgKeychain.Instance.ImportAllKeys(repoManager.PublicKey);
+            
+            MailManager.Instance.RunDispatcher();
             
             host.Run();
             
+        }
+
+        private static void ExitLogic(object? o, EventArgs e)
+        {
+            GpgKeychain.Instance.Dispose();
+            MailManager.Instance.Dispose();
+
         }
 
         private static void CreateDbIfNotExists(IHost host)

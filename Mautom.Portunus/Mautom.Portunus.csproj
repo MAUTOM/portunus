@@ -50,20 +50,27 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
+      <None Remove="portunus-launch.sh" />
+      <Content Include="portunus-launch.sh">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="MailKit" Version="2.8.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.6" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6" />
+      <PackageReference Include="MimeKit" Version="2.9.1" />
       <PackageReference Include="morelinq" Version="3.3.2" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.1" />
+      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.1.2" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Mautom.Portunus.LoggingService\Mautom.Portunus.LoggingService.csproj" />
       <ProjectReference Include="..\Mautom.Portunus.Repository\Mautom.Portunus.Repository.csproj" />
+      <ProjectReference Include="..\Portunus.Crypto\Portunus.Crypto.csproj" />
     </ItemGroup>
 
 

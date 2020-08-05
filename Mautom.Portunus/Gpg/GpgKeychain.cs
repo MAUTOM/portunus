@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security;
 using System.Text;
 using Libgpgme;
 using Mautom.Portunus.Config;
@@ -10,6 +11,7 @@ using Mautom.Portunus.Shared.Pgp;
 using Microsoft.Extensions.Configuration;
 using NLog;
 using NLog.Fluent;
+using Portunus.Crypto;
 
 namespace Mautom.Portunus.Gpg
 {
@@ -28,6 +30,8 @@ namespace Mautom.Portunus.Gpg
 
         public IKeyStore KeyStore => _context.KeyStore;
         public string SigningKeyFingerprint { get; }
+
+        public string HomeDir => _context.EngineInfo.HomeDir;
         
         private GpgKeychain()
         {
@@ -37,7 +41,7 @@ namespace Mautom.Portunus.Gpg
                 _context.EngineInfo.HomeDir = Environment.GetEnvironmentVariable("GNUPGHOME");
             
             _encoding = new UTF8Encoding();
-            _log.Info($"Initialized GPG keychain with homedir: {_context.EngineInfo.HomeDir}");
+            _log.Info($"Initialized GPG (v{_context.EngineInfo.Version}) keychain with homedir: {_context.EngineInfo.HomeDir}");
             
             var config = ConfigManager.Configuration;
             var pgp = config.GetSection("PGP");
@@ -196,19 +200,29 @@ namespace Mautom.Portunus.Gpg
         private PassphraseResult GpgPasswordCallback(Context ctx, PassphraseInfo info, ref char[] passphrase)
         {
             // TODO: implement private key password reading securely, if pinentry is not working
-            // TODO: [NOTE]: This WILL NOT be called when the system has a functional pinentry setup.
+            // TODO: [NOTE]: This *WILL NOT* be called when the system has a functional pinentry setup (ideal case).
             // TODO: this is for development purposes, '.rootkey-password' must be created manually.
+            
+            // if running with --with-root-password
+            if (ConfigManager.RootPassword != null)
+            {
+                passphrase = CryptoTools.ToInsecureString(ConfigManager.RootPassword).ToCharArray();
+                return PassphraseResult.Success;
+            }
+            
             
             var pwFile = Path.Combine(Environment.CurrentDirectory, ".rootkey-password");
 
             if (!File.Exists(pwFile))
                 return PassphraseResult.Canceled;
 
-            var pw = File.ReadAllText(pwFile);
-            if (string.IsNullOrEmpty(pw))
+            var pw = CryptoTools.ToSecureString(File.ReadAllText(pwFile));
+            
+            if (pw.Length == 0)
                 return PassphraseResult.Canceled;
 
-            passphrase = pw.ToCharArray();
+            passphrase = CryptoTools.ToInsecureString(pw).ToCharArray();
+            pw.Dispose();
             return PassphraseResult.Success;
         }
 
@@ -231,6 +245,7 @@ namespace Mautom.Portunus.Gpg
         
         public void Dispose()
         {
+            _log.Debug("GpgKeyChain.Dispose() called.");
             _context.Dispose();
         }
     }

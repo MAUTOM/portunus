@@ -2,20 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Text;
 using AutoMapper;
 using Libgpgme;
+using Mautom.Portunus.Config;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities.DataTransferObjects;
 using Mautom.Portunus.Entities.Models;
 using Mautom.Portunus.Gpg;
+using Mautom.Portunus.Mail;
 using Mautom.Portunus.Shared.Pgp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Net.Http.Headers;
+using MimeKit;
+using MimeKit.Cryptography;
+using MimeKit.Text;
 using Newtonsoft.Json;
 using NLog;
+using ContentDisposition = System.Net.Mime.ContentDisposition;
+using ContentType = System.Net.Mime.ContentType;
+using PublicKeyAlgorithm = Mautom.Portunus.Shared.Pgp.PublicKeyAlgorithm;
 
 namespace Mautom.Portunus.Controllers
 {
@@ -245,7 +253,24 @@ namespace Mautom.Portunus.Controllers
                 _repository.KeyIdentity.Update(identity);
                 // TODO: send mail
                 
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("MAUTOM Portunus", ConfigManager.SmtpSettings.GetValue<string>("Sender")));
+                message.To.Add(new MailboxAddress(identity.Name, identity.Email));
+                message.Subject = "Verify your identity";
                 
+                var msgBody = $@"Dear {identity.Name},
+You are receiving this e-mail because you have requested the verification of you PGP key and e-mail address.
+Please click the link below, to verify your address and publish it on the server:
+
+{CreateVerificationUrl(vp.Token, verification.VerificationCode)}
+
+Please do not reply to this e-mail.";
+
+                var emailBody = GpgKeychain.Instance.EncryptAndSign(msgBody, identity.PublicKeyFingerprint);
+
+                message.Body = new TextPart(TextFormat.Plain) { Text = emailBody };
+                
+                MailManager.Instance.Enqueue(message);
             }
             
             
@@ -256,7 +281,7 @@ namespace Mautom.Portunus.Controllers
             return Ok(response);
         }
         
-        [HttpGet("verify/{token}")]
+        [HttpGet("verify/{token}", Name = "Verify")]
         public IActionResult Verify(Guid token, [FromQuery] ushort secret)
         {
             if (secret < 10000)
@@ -292,7 +317,18 @@ namespace Mautom.Portunus.Controllers
             
             return Ok();
         }
-        
 
+
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            return Content(
+                GpgKeychain.Instance.EncryptAndSign("hello there", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0"), "text/plain");
+        }
+
+        private string CreateVerificationUrl(Guid verificationToken, ushort verificationSecret)
+        {
+            return new Uri(ConfigManager.BaseUrl, Url.Action("Verify", "Vks", new {token = verificationToken, secret = verificationSecret})).ToString();
+        }
     }
 }

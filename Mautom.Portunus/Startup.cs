@@ -19,9 +19,11 @@
 using System.IO;
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
+using Mautom.Portunus.Config;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities;
 using Mautom.Portunus.Extensions;
+using Mautom.Portunus.LoggingService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -121,6 +123,9 @@ namespace Mautom.Portunus
             app.UseRouting();
             
             app.UseAuthorization();
+            
+            if(ConfigManager.LoggingSettings.GetValue<bool>("EnableRequestLogging"))
+                app.UseRequestResponseLogging();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

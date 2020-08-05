@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mautom.Portunus.Repository"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mautom.Portunus.Shared", "Mautom.Portunus.Shared\Mautom.Portunus.Shared.csproj", "{1472AFA9-55AE-40F4-A12A-D94542D1FE06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portunus.Crypto", "Portunus.Crypto\Portunus.Crypto.csproj", "{E6557401-03BE-4C0F-9DD6-3CA0556C2B53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{1472AFA9-55AE-40F4-A12A-D94542D1FE06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1472AFA9-55AE-40F4-A12A-D94542D1FE06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1472AFA9-55AE-40F4-A12A-D94542D1FE06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6557401-03BE-4C0F-9DD6-3CA0556C2B53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6557401-03BE-4C0F-9DD6-3CA0556C2B53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6557401-03BE-4C0F-9DD6-3CA0556C2B53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6557401-03BE-4C0F-9DD6-3CA0556C2B53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

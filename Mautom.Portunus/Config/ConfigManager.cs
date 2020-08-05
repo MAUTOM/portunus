@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Security;
 using Microsoft.Extensions.Configuration;
 using NLog;
 using NLog.Fluent;
@@ -11,6 +12,15 @@ namespace Mautom.Portunus.Config
     {
         public static IConfigurationRoot Configuration { get; }
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        
+        public static SecureString? RootPassword { get; set; }
+
+        public static IConfigurationSection ApiSettings => Configuration.GetSection("API");
+        public static IConfigurationSection SmtpSettings => Configuration.GetSection("SMTP");
+        public static IConfigurationSection LoggingSettings => Configuration.GetSection("Logging");
+        public static IConfigurationSection PgpSettings => Configuration.GetSection("PGP");
+        
+        public static readonly Uri BaseUrl;
         
         static ConfigManager()
         {
@@ -30,6 +40,8 @@ namespace Mautom.Portunus.Config
             {
                 Logger.Debug($"Loaded: {cfg}");
             }
+            
+            BaseUrl = new Uri($"https://{ApiSettings.GetValue<string>("Host")}:{ApiSettings.GetValue<int>("Port")}", UriKind.Absolute);
             
         }
     }
