@@ -287,7 +287,7 @@ Please do not reply to this e-mail.";
             foreach (var verification in verifications)
             {
                 if (verification.VerificationCode != secret) continue;
-                var identity = _repository.KeyIdentity.GetIdentityByEmail(verification.Email);
+                var identity = _repository.KeyIdentity.GetIdentityByEmail(verification.Email, false);
                     
                 if (identity == null)
                 {

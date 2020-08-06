@@ -68,9 +68,10 @@ namespace Mautom.Portunus.Entities
                 .HasIndex(av => av.Email)
                 .IsUnique();
             
+            
             // seed
-            modelBuilder.ApplyConfiguration(new PublicKeyConfiguration());
-            modelBuilder.ApplyConfiguration(new KeyIdentityConfiguration());
+            //modelBuilder.ApplyConfiguration(new PublicKeyConfiguration());
+            //modelBuilder.ApplyConfiguration(new KeyIdentityConfiguration());
         }
     }
 }

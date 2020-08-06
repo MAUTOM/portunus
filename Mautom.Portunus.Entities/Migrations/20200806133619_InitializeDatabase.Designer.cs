@@ -3,14 +3,16 @@ using System;
 using Mautom.Portunus.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Mautom.Portunus.Entities.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20200806133619_InitializeDatabase")]
+    partial class InitializeDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +35,7 @@ namespace Mautom.Portunus.Entities.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("token")
                         .HasColumnType("char(36)")
-                        .HasDefaultValue(Guid.NewGuid());
+                        .HasDefaultValue(new Guid("93f047eb-2d03-46ae-8e8f-6be05573ee0b"));
 
                     b.Property<ushort>("VerificationCode")
                         .HasColumnName("verification_code")
