@@ -6,10 +6,12 @@ using System.Net.Mime;
 using System.Text;
 using AutoMapper;
 using Libgpgme;
+using Mautom.Portunus.Config;
 using Mautom.Portunus.Contracts;
 using Mautom.Portunus.Entities.DataTransferObjects;
 using Mautom.Portunus.Entities.Models;
 using Mautom.Portunus.Formatters;
+using Mautom.Portunus.Gpg;
 using Mautom.Portunus.Shared.Pgp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -62,7 +64,7 @@ namespace Mautom.Portunus.Controllers
                         if (search.Length != 40 && search.Length != 16 && search.Length != 8)
                             return BadRequest();
 
-                        var key = _repository.PublicKey.GetPublicKeyByKeyId(search, false);
+                        var key = _repository.PublicKey.GetPublicKeyByKeyId(search, ConfigManager.SupplyOnlyPublishedKeys, false);
 
                         if (key == null)
                             return NotFound();
@@ -124,7 +126,7 @@ namespace Mautom.Portunus.Controllers
 
                         // should be only one key with any ID
 
-                        var key = _repository.PublicKey.GetPublicKeyByKeyId(search, false);
+                        var key = _repository.PublicKey.GetPublicKeyByKeyId(search, ConfigManager.SupplyOnlyPublishedKeys, false);
 
                         var pubKeyResult = _mapper.Map<PublicKeyDto>(key);
 
@@ -181,22 +183,14 @@ namespace Mautom.Portunus.Controllers
                 return BadRequest();
 
             _logger.Info("Received HKP key submission");
-            using var gpgContext = new Context {KeylistMode = KeylistMode.Signatures, Armor = true};
 
-            var store = gpgContext.KeyStore;
-            var encoder = new UTF8Encoding();
-            var keyData = encoder.GetBytes(keytext);
-
-            var mStream = new MemoryStream(keyData);
-            var gpgStream = new GpgmeStreamData(mStream);
-
-            var result = store.Import(gpgStream);
+            var result = GpgKeychain.Instance.ImportArmoredKey(keytext);
 
             foreach (var importResult in result.Imports)
             {
-                var key = (PgpKey) store.GetKey(importResult.Fpr, false);
+                var key = (PgpKey) GpgKeychain.Instance.KeyStore.GetKey(importResult.Fpr, false);
                 
-                if (_repository.PublicKey.GetPublicKeyByFingerprint(importResult.Fpr, false) != null)
+                if (_repository.PublicKey.GetPublicKeyByFingerprint(importResult.Fpr, false, false) != null)
                 {
                     _logger.Warn($"Submission of already existing Fpr: {key.Fingerprint}. Skipping.");
                     continue;
@@ -205,12 +199,8 @@ namespace Mautom.Portunus.Controllers
                 _logger.Info(
                     $"Imported fpr:{key.Fingerprint}, created at: {key.Uid.Signatures.Timestamp}, identities: {key.Uids.Count()}");
 
-                var data = new GpgmeMemoryData {Encoding = DataEncoding.Armor};
-                store.Export(key.Fingerprint, data);
-                data.Position = 0;
 
-                using var reader = new StreamReader(data, Encoding.ASCII);
-                var armor = reader.ReadToEnd();
+                var armor = GpgKeychain.Instance.ExportArmoredKey(key.Fingerprint);
 
                 // create new db record
 
@@ -241,8 +231,6 @@ namespace Mautom.Portunus.Controllers
                 };
 
                 _repository.PublicKey.CreatePublicKey(publicKey);
-
-                store.DeleteKey(key, false);
 
                 key.Dispose();
 

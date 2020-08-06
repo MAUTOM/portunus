@@ -31,7 +31,11 @@ namespace Mautom.Portunus.Gpg
         public IKeyStore KeyStore => _context.KeyStore;
         public string SigningKeyFingerprint { get; }
 
-        public string HomeDir => _context.EngineInfo.HomeDir;
+        public string HomeDir
+        {
+            get => _context.EngineInfo.HomeDir;
+            set => _context.EngineInfo.HomeDir = value;
+        }
         
         private GpgKeychain()
         {

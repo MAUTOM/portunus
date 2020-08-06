@@ -8,13 +8,13 @@
         <Product>Portunus</Product>
         <NeutralLanguage>hu-HU</NeutralLanguage>
         <IsPackable>true</IsPackable>
-        <PackageVersion>0.8.1</PackageVersion>
+        <PackageVersion>0.8.1-alpha</PackageVersion>
         <Title>Portunus</Title>
         <Authors>Bence Horváth</Authors>
         <Description>Portunus OpenPGP verifying keyserver in .NET Core.</Description>
         <Copyright>Copyright (C) 2020 Bence Horváth</Copyright>
         <PackageProjectUrl>https://github.com/MAUTOM/portunus</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/MAUTOM/portunus/blob/master/LICENSE.txt</PackageLicenseUrl>
+        <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/MAUTOM/portunus</RepositoryUrl>
         <RepositoryType>Git</RepositoryType>
         <PackageReleaseNotes>Internal development testing version</PackageReleaseNotes>
@@ -29,6 +29,7 @@
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
       <DocumentationFile>bin\Release\Portunus-Documentation.xml</DocumentationFile>
+      <NoWarn>1701;1702;1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

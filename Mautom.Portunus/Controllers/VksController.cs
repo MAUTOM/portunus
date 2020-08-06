@@ -58,7 +58,7 @@ namespace Mautom.Portunus.Controllers
                 return BadRequest();
             }
 
-            var key = _repository.PublicKey.GetPublicKeyByFingerprint(fingerprint, false);
+            var key = _repository.PublicKey.GetPublicKeyByFingerprint(fingerprint, ConfigManager.SupplyOnlyPublishedKeys, false);
 
             if (key == null)
             {
@@ -87,7 +87,7 @@ namespace Mautom.Portunus.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult GetByKeyId(string longKeyId)
         {
-            var key = _repository.PublicKey.GetPublicKeyByKeyId(longKeyId, false);
+            var key = _repository.PublicKey.GetPublicKeyByKeyId(longKeyId, ConfigManager.SupplyOnlyPublishedKeys, false);
             
             if (key == null)
             {
@@ -118,7 +118,7 @@ namespace Mautom.Portunus.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult GetByEmail(string email)
         {
-            var identity = _repository.KeyIdentity.GetIdentityByEmail(email, false);
+            var identity = _repository.KeyIdentity.GetIdentityByEmail(email, ConfigManager.SupplyOnlyPublishedKeys, false);
 
             if (identity == null)
             {
@@ -150,7 +150,7 @@ namespace Mautom.Portunus.Controllers
             {
                 var key = (PgpKey) GpgKeychain.Instance.KeyStore.GetKey(importResult.Fpr, false);
 
-                if (_repository.PublicKey.GetPublicKeyByFingerprint(importResult.Fpr, false) != null)
+                if (_repository.PublicKey.GetPublicKeyByFingerprint(importResult.Fpr, false, false) != null)
                 {
                     Log.Warn($"Submission of already existing Fpr: {key.Fingerprint}. Skipping.");
                     continue;

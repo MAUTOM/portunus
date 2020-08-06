@@ -34,25 +34,30 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog;
 
 namespace Mautom.Portunus
 {
     public class Program
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         public static void Main(string[] args)
         {
             var config = ConfigManager.Configuration;
-            
+
             #region Signing key password storage
+
             if (args.Contains("--with-root-password"))
             {
-                Console.WriteLine("WARNING! It is recommended that the signing key password be provided by an EXTERNAL source (such as via pinentry).");
+                Console.WriteLine(
+                    "WARNING! It is recommended that the signing key password be provided by an EXTERNAL source (such as via pinentry).");
                 Console.WriteLine("Entering PGP root key password setting mode.");
-                
+
                 var secure = new SecureString();
                 var secure2 = new SecureString();
                 ConsoleKeyInfo key;
-                
+
                 Console.Write("Enter PGP root key password: ");
                 do
                 {
@@ -62,6 +67,7 @@ namespace Mautom.Portunus
                     secure.AppendChar(key.KeyChar);
                     Console.Write("*");
                 } while (key.Key != ConsoleKey.Enter);
+
                 Console.WriteLine();
                 Console.Write("Repeat password: ");
                 do
@@ -72,8 +78,9 @@ namespace Mautom.Portunus
                     secure2.AppendChar(key.KeyChar);
                     Console.Write("*");
                 } while (key.Key != ConsoleKey.Enter);
+
                 Console.WriteLine();
-                
+
                 if (!secure.Equals(secure2))
                 {
                     Console.WriteLine("Passwords do not match!");
@@ -84,71 +91,76 @@ namespace Mautom.Portunus
                 ConfigManager.RootPassword.MakeReadOnly();
                 secure.Dispose();
                 secure2.Dispose();
-                
+
                 Console.WriteLine("Signing key password set, continuing startup...");
                 Thread.Sleep(1500);
             }
-            
-            #endregion            
-            
+
+            #endregion
+
             var certificateSettings = config.GetSection("certificateSettings");
             string certificateFileName = certificateSettings.GetValue<string>("fileName");
             string certificatePassword = certificateSettings.GetValue<string>("password");
 
-            Console.WriteLine($"Setting cert to: {certificateFileName}");
-            //Console.ReadLine();
-            
+            Log.Info($"Setting certificate file to: {certificateFileName}");
+
             var certificate = new X509Certificate2(certificateFileName, certificatePassword);
+
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GNUPGHOME")))
+            {
+                Log.Info("GNUPGHOME not set, falling back to config file.");
+                var gpgHome = ConfigManager.PgpSettings["HomeDir"];
+                GpgKeychain.Instance.HomeDir = gpgHome;
+                Environment.SetEnvironmentVariable("GNUPGHOME", gpgHome);
+                Log.Info($"Set GNUPGHOME to {gpgHome}");
+            }
 
             if (ConfigManager.PgpSettings.GetValue<bool>("ConfirmPurge"))
             {
-                Console.WriteLine("Purging " + GpgKeychain.Instance.HomeDir);
-                Console.WriteLine("CONFIRM WITH ENTER");
+                Log.Info("Purging " + GpgKeychain.Instance.HomeDir);
+                Log.Info("CONFIRM WITH ENTER");
                 Console.ReadLine();
             }
 
             GpgKeychain.Instance.Purge();
-            
+
             AppDomain.CurrentDomain.ProcessExit += ExitLogic;
             Console.CancelKeyPress += ExitLogic;
-        
+
             var host = new WebHostBuilder()
                 .UseKestrel(
                     options =>
                     {
                         options.AddServerHeader = false;
                         options.Listen(IPAddress.Parse(ConfigManager.ApiSettings.GetValue("Host", "localhost")),
-                            ConfigManager.ApiSettings.GetValue<int>("Port"), listenOptions =>
-                        {
-                            listenOptions.UseHttps(certificate);
-                        });
+                            ConfigManager.ApiSettings.GetValue<int>("Port"),
+                            listenOptions => { listenOptions.UseHttps(certificate); });
                         options.Listen(IPAddress.Loopback, 5000);
                     }
                 )
                 .UseConfiguration(config)
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
-                .UseUrls($"https://{ConfigManager.ApiSettings.GetValue<string>("Host")}:{ConfigManager.ApiSettings.GetValue<int>("Port")}", "http://localhost:5000")
+                .UseUrls(
+                    $"https://{ConfigManager.ApiSettings.GetValue<string>("Host")}:{ConfigManager.ApiSettings.GetValue<int>("Port")}",
+                    "http://localhost:5000")
                 .Build();
-            
-            //host.MigrateDatabase();
+
             using var scope = host.Services.CreateScope();
             var repoManager = scope.ServiceProvider.GetRequiredService<IRepositoryManager>();
-            
-            if(ConfigManager.PgpSettings.GetValue<bool>("LoadFromDatabase"))
+
+            if (ConfigManager.PgpSettings.GetValue<bool>("LoadFromDatabase"))
                 GpgKeychain.Instance.ImportAllKeys(repoManager.PublicKey);
-            
+
             MailManager.Instance.RunDispatcher();
-            
+
             host.Run();
-            
         }
 
         private static void ExitLogic(object? o, EventArgs e)
         {
             GpgKeychain.Instance.Dispose();
             MailManager.Instance.Dispose();
-
         }
 
         private static void CreateDbIfNotExists(IHost host)
@@ -167,7 +179,7 @@ namespace Mautom.Portunus
                 logger.LogError(ex, "An error occurred creating the DB.");
             }
         }
-        
+
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
