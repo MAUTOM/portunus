@@ -19,6 +19,8 @@ namespace Mautom.Portunus.Config
         public static IConfigurationSection SmtpSettings => Configuration.GetSection("SMTP");
         public static IConfigurationSection LoggingSettings => Configuration.GetSection("Logging");
         public static IConfigurationSection PgpSettings => Configuration.GetSection("PGP");
+
+        public static bool SupplyOnlyPublishedKeys => PgpSettings.GetValue<bool>("OnlyPublished");
         
         public static readonly Uri BaseUrl;
         

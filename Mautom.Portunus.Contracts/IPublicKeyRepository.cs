@@ -23,9 +23,9 @@ namespace Mautom.Portunus.Contracts
 {
     public interface IPublicKeyRepository : IRepositoryBase<PublicKey>
     {
-        IEnumerable<PublicKey> GetAllPublicKeys(bool trackChanges = true);
-        PublicKey? GetPublicKeyByFingerprint(string fingerprint, bool trackChanges = true);
-        PublicKey? GetPublicKeyByKeyId(string keyId, bool trackChanges = true);
+        IEnumerable<PublicKey> GetAllPublicKeys(bool onlyPublished = true, bool trackChanges = true);
+        PublicKey? GetPublicKeyByFingerprint(string fingerprint, bool onlyPublished = true, bool trackChanges = true);
+        PublicKey? GetPublicKeyByKeyId(string keyId, bool onlyPublished = true, bool trackChanges = true);
         void CreatePublicKey(PublicKey key);
     }
 }

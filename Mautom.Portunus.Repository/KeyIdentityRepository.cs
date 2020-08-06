@@ -54,10 +54,21 @@ namespace Mautom.Portunus.Repository
                 .Include(id => id.PublicKey)
                 .SingleOrDefault();
 
-        public KeyIdentity? GetIdentityByEmail(string email, bool trackChanges = true) => FindByCondition(
-                identity => identity.Email.Equals(email, StringComparison.OrdinalIgnoreCase), trackChanges)
-            .Include(id => id.PublicKey)
-            .SingleOrDefault();
+        public KeyIdentity? GetIdentityByEmail(string email, bool onlyPublished = true, bool trackChanges = true)
+        {
+            if (!onlyPublished)
+            {
+                return FindByCondition(
+                        identity => identity.Email.Equals(email, StringComparison.OrdinalIgnoreCase), trackChanges)
+                    .Include(id => id.PublicKey)
+                    .SingleOrDefault();
+            }
+            
+            return FindByCondition(
+                    identity => identity.Email.Equals(email, StringComparison.OrdinalIgnoreCase) && identity.Status == IdentityStatus.Published, trackChanges)
+                .Include(id => id.PublicKey)
+                .SingleOrDefault();
+        }
 
         public PublicKeyFingerprint GetFingerprintByToken(Guid token, bool trackChanges = false)
         {

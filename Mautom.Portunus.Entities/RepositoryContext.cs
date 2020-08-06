@@ -58,7 +58,7 @@ namespace Mautom.Portunus.Entities
 
             modelBuilder.Entity<PublicKey>()
                 .Property(k => k.Flags)
-                .HasDefaultValue(PublicKeyFlags.None);
+                .HasDefaultValue(PublicKeyFlags.Default);
 
             modelBuilder.Entity<AddressVerification>()
                 .Property(av => av.Token)

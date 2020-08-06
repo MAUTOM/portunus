@@ -34,33 +34,68 @@ namespace Mautom.Portunus.Repository
             
         }
 
-        public IEnumerable<PublicKey> GetAllPublicKeys(bool trackChanges = true)
+        public IEnumerable<PublicKey> GetAllPublicKeys(bool onlyPublished = true, bool trackChanges = true)
         {
-            return FindAll(trackChanges)
+            if (!onlyPublished)
+            {
+                return FindAll(trackChanges)
+                    .OrderBy(pk => pk.SubmissionDate)
+                    .Include(pk => pk.KeyIdentities)
+                    .ToList();
+            }
+
+            return FindByCondition(key => (key.Flags & PublicKeyFlags.Verified) == PublicKeyFlags.Verified,
+                    trackChanges)
                 .OrderBy(pk => pk.SubmissionDate)
-                .Include(pk => pk.KeyIdentities)
+                .Include(key => key.KeyIdentities)
                 .ToList();
         }
 
-        public PublicKey? GetPublicKeyByFingerprint(string fingerprint, bool trackChanges = true)
+        public PublicKey? GetPublicKeyByFingerprint(string fingerprint, bool onlyPublished = true, bool trackChanges = true)
         {
-            return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(fingerprint)), trackChanges)
+            if (!onlyPublished)
+            {
+                return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(fingerprint)),
+                        trackChanges)
+                    .Include(pk => pk.KeyIdentities)
+                    .SingleOrDefault();
+            }
+            
+            return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(fingerprint)) && (key.Flags & PublicKeyFlags.Verified) == PublicKeyFlags.Verified,
+                    trackChanges)
                 .Include(pk => pk.KeyIdentities)
                 .SingleOrDefault();
         }
 
-        public PublicKey? GetPublicKeyByKeyId(string keyId, bool trackChanges = true)
+        public PublicKey? GetPublicKeyByKeyId(string keyId, bool onlyPublished = true, bool trackChanges = true)
         {
+            if (!onlyPublished)
+            {
+                if (keyId.Length == 40)
+                    return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(keyId)), trackChanges)
+                        .Include(pk => pk.KeyIdentities)
+                        .SingleOrDefault();
+
+                return FindByCondition(
+                        key => key.LongKeyId.Equals(keyId, StringComparison.OrdinalIgnoreCase) ||
+                               key.ShortKeyId.Equals(keyId, StringComparison.OrdinalIgnoreCase),
+                        trackChanges)
+                    .Include(pk => pk.KeyIdentities)
+                    .FirstOrDefault();
+            }
+            
             if (keyId.Length == 40)
-                return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(keyId)), trackChanges)
+                return FindByCondition(key => key.Fingerprint.Equals(new PublicKeyFingerprint(keyId)) && (key.Flags & PublicKeyFlags.Verified) == PublicKeyFlags.Verified, trackChanges)
                     .Include(pk => pk.KeyIdentities)
                     .SingleOrDefault();
-            
+
             return FindByCondition(
-                    key => key.LongKeyId.Equals(keyId, StringComparison.OrdinalIgnoreCase) || key.ShortKeyId.Equals(keyId, StringComparison.OrdinalIgnoreCase),
+                    key => (key.LongKeyId.Equals(keyId, StringComparison.OrdinalIgnoreCase) ||
+                           key.ShortKeyId.Equals(keyId, StringComparison.OrdinalIgnoreCase)) && (key.Flags & PublicKeyFlags.Verified) == PublicKeyFlags.Verified,
                     trackChanges)
                 .Include(pk => pk.KeyIdentities)
                 .FirstOrDefault();
+            
         }
         
         public void CreatePublicKey(PublicKey key)

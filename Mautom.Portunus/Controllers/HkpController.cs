@@ -222,7 +222,7 @@ namespace Mautom.Portunus.Controllers
 
                 // create key record
                 var keyFingerprint = new PublicKeyFingerprint(key.Fingerprint);
-                var flags = PublicKeyFlags.None;
+                var flags = PublicKeyFlags.Default;
                 if (key.Disabled) flags |= PublicKeyFlags.Disabled;
                 if (key.Expired) flags |= PublicKeyFlags.Expired;
                 if (key.Revoked) flags |= PublicKeyFlags.Revoked;

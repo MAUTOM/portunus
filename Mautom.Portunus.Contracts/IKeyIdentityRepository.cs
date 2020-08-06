@@ -12,7 +12,7 @@ namespace Mautom.Portunus.Contracts
         IEnumerable<KeyIdentity> SearchIdentities(string searchPattern, bool exact = false, bool trackChanges = true);
         IEnumerable<KeyIdentity> GetIdentitiesByToken(Guid token, bool trackChanges = true);
         KeyIdentity? GetIdentityByEmail(string fingerprint, string email, bool trackChanges = true);
-        KeyIdentity? GetIdentityByEmail(string email, bool trackChanges = true);
+        KeyIdentity? GetIdentityByEmail(string email, bool onlyPublished = true, bool trackChanges = true);
         PublicKeyFingerprint GetFingerprintByToken(Guid token, bool trackChanges = false);
         void CreateKeyIdentity(KeyIdentity key);
     }

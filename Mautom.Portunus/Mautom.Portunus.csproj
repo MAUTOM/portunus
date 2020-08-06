@@ -7,6 +7,18 @@
         <Company>Műszer Automatika Kft.</Company>
         <Product>Portunus</Product>
         <NeutralLanguage>hu-HU</NeutralLanguage>
+        <IsPackable>true</IsPackable>
+        <PackageVersion>0.8.1</PackageVersion>
+        <Title>Portunus</Title>
+        <Authors>Bence Horváth</Authors>
+        <Description>Portunus OpenPGP verifying keyserver in .NET Core.</Description>
+        <Copyright>Copyright (C) 2020 Bence Horváth</Copyright>
+        <PackageProjectUrl>https://github.com/MAUTOM/portunus</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/MAUTOM/portunus/blob/master/LICENSE.txt</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/MAUTOM/portunus</RepositoryUrl>
+        <RepositoryType>Git</RepositoryType>
+        <PackageReleaseNotes>Internal development testing version</PackageReleaseNotes>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

@@ -24,14 +24,14 @@ namespace Mautom.Portunus.Shared.Pgp
     public enum PublicKeyFlags 
     {
         [StringValue("")]
-        None = 0,
+        Default = 1,
         [StringValue("r")]
-        Revoked = 1,
+        Revoked = 2,
         [StringValue("e")]
-        Expired = 2,
+        Expired = 4,
         [StringValue("d")]
-        Disabled = 4,
+        Disabled = 8,
         [StringValue("v")]
-        Verified = 8
+        Verified = 16
     }
 }

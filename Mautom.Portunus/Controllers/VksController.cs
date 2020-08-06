@@ -143,8 +143,6 @@ namespace Mautom.Portunus.Controllers
         {
             if (string.IsNullOrEmpty(up.KeyText))
                 return BadRequest();
-            
-            //Log.Debug($"Got keytext: {up.KeyText}");
 
             var result = GpgKeychain.Instance.ImportArmoredKey(up.KeyText);
 
@@ -179,7 +177,7 @@ namespace Mautom.Portunus.Controllers
 
                 // create key record
                 var keyFingerprint = new PublicKeyFingerprint(key.Fingerprint);
-                var flags = PublicKeyFlags.None;
+                var flags = PublicKeyFlags.Default;
                 if (key.Disabled) flags |= PublicKeyFlags.Disabled;
                 if (key.Expired) flags |= PublicKeyFlags.Expired;
                 if (key.Revoked) flags |= PublicKeyFlags.Revoked;
@@ -200,18 +198,12 @@ namespace Mautom.Portunus.Controllers
                 _repository.PublicKey.CreatePublicKey(publicKey);
                 _repository.Save();
                 
-#if DEBUG                
-                GpgKeychain.Instance.KeyStore.DeleteKey(key, false); 
-#endif
-                
                 key.Dispose();
                 
                 // produce response
                 var response = new KeyUploadResult(key.Fingerprint, verificationToken, statusList);
 
                 return Ok(response);
-
-                //Console.WriteLine($"Read gpg data: {data.Length}\nArmor: {armor}");
             }
             
             return Ok();
@@ -259,7 +251,8 @@ namespace Mautom.Portunus.Controllers
                 message.Subject = "Verify your identity";
                 
                 var msgBody = $@"Dear {identity.Name},
-You are receiving this e-mail because you have requested the verification of you PGP key and e-mail address.
+You are receiving this e-mail because you have requested the verification of your PGP key and e-mail address.
+Your e-mail address is: {identity.Email}
 Please click the link below, to verify your address and publish it on the server:
 
 {CreateVerificationUrl(vp.Token, verification.VerificationCode)}
@@ -314,8 +307,8 @@ Please do not reply to this e-mail.";
             }
             
             _repository.Save();
-            
-            return Ok();
+
+            return Content("E-mail address successfully validated.", "text/plain");
         }
 
 
@@ -326,6 +319,12 @@ Please do not reply to this e-mail.";
                 GpgKeychain.Instance.EncryptAndSign("hello there", "33EFA0592FAEEF4DD84CD8A0E4C22D9F57CBD3F0"), "text/plain");
         }
 
+        /// <summary>
+        /// Creates a VKS verification URL for the specified token and secret.
+        /// </summary>
+        /// <param name="verificationToken">The verification GUID received upon key submission</param>
+        /// <param name="verificationSecret">The secret (5 digits)</param>
+        /// <returns>The verification URL</returns>
         private string CreateVerificationUrl(Guid verificationToken, ushort verificationSecret)
         {
             return new Uri(ConfigManager.BaseUrl, Url.Action("Verify", "Vks", new {token = verificationToken, secret = verificationSecret})).ToString();
